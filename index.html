@@ -801,12 +801,11 @@
 <div id="toast"><span id="toastMsg"></span><button id="toastAct"></button></div>
 
 <script>
-/* ================= KONFIG ================= */
-const SUPABASE_URL = 'https://hepaktfsynslilmooswc.supabase.co';        /* ← ISI DI SINI */
-const SUPABASE_ANON_KEY = 'sb_publishable_KaVx4gMZGBDoyK6FGU8fwA_eKVCRQ5q';      /* ← ISI DI SINI */
+/* ================= KONFIG (sudah terisi) ================= */
+const SUPABASE_URL = 'https://hepaktfsynslilmooswc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_KaVx4gMZGBDoyK6FGU8fwA_eKVCRQ5q';
 const CONFIG_OK = /^https:\/\/[a-z0-9-]+\.supabase\.co/i.test(SUPABASE_URL)
-  && SUPABASE_ANON_KEY.length > 20
-  && !SUPABASE_ANON_KEY.includes('TEMPEL');
+  && SUPABASE_ANON_KEY.length > 20;
 
 let sb = null;
 
@@ -924,17 +923,7 @@ function setGate(mode, extra){
   const body = $('#gateBody');
   $('#gate').hidden = false;
   document.body.classList.add('locked');
-  if(mode === 'config'){
-    body.innerHTML = `
-      <p class="gate-sub">Web ini belum disambungkan ke gudang awan.</p>
-      <div class="gate-steps">
-        <b>1.</b> Jalankan skrip SQL di <b>SQL Editor</b> Supabase (ada di panduan).<br>
-        <b>2.</b> Buka <b>Settings → API</b>, salin <code>Project URL</code> &amp; <code>anon public key</code>.<br>
-        <b>3.</b> Di index.html, temukan bagian <code>KONFIG</code> paling atas script,
-        tempel dua nilai itu ke <code>SUPABASE_URL</code> dan <code>SUPABASE_ANON_KEY</code>.<br>
-        <b>4.</b> Simpan, push ke GitHub, muat ulang halaman ini.
-      </div>`;
-  } else if(mode === 'loading'){
+  if(mode === 'loading'){
     body.innerHTML = `<div class="spin"></div><p class="gate-sub">Menyambung ke gudang…</p>`;
   } else {
     const up = mode === 'signup';
@@ -975,7 +964,7 @@ async function doAuth(){
       return;
     }
     if(isUp && !r.data.session){
-      errEl.textContent = 'Akun dibuat! Kalau diminta verifikasi email, cek inbox dulu — atau matikan "Confirm email" di Supabase → Authentication → Providers.';
+      errEl.textContent = 'Akun dibuat! Cek email untuk verifikasi, atau matikan "Confirm email" di Supabase.';
       $('#gGo').disabled = false;
       return;
     }
@@ -2126,9 +2115,8 @@ function finishBreath(){
 
 /* ================= BOOT ================= */
 (function boot(){
-  if(!CONFIG_OK){ setGate('config'); return; }
   try{ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
-  catch(e){ setGate('config'); return; }
+  catch(e){ $('#gateBody').innerHTML = '<p class="gate-sub">Konfigurasi Supabase salah — cek kembali Project URL dan key.</p>'; return; }
   snapshotLegacy();
 
   let appInited = false;
