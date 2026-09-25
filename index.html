@@ -53,9 +53,6 @@
   .gate-field:focus{border-color:var(--green)}
   #gGo{width:100%;justify-content:center;margin-top:14px}
   #gErr{font:500 12.5px 'Instrument Sans';color:var(--danger);min-height:18px;margin-top:10px}
-  .gate-steps{text-align:left;font:400 13px/1.75 'Instrument Sans';color:var(--soft)}
-  .gate-steps b{color:var(--ink)}
-  .gate-steps code{font:600 12px ui-monospace,Menlo,Consolas,monospace;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
   .spin{width:30px;height:30px;border-radius:50%;margin:0 auto 16px;border:3px solid var(--line);border-top-color:var(--green);animation:spin 1s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
 
@@ -142,14 +139,13 @@
   .card.fresh{animation:settle .5s cubic-bezier(.2,.8,.2,1) both}
   @keyframes settle{from{opacity:0;transform:translateY(20px) rotate(var(--rot))}to{opacity:1;transform:translateY(0) rotate(var(--rot))}}
   .card-actions{position:absolute;top:12px;right:12px;display:flex;gap:4px;opacity:0;transition:opacity .25s;z-index:3}
-  .card:hover .card-actions,.album-card:hover .card-actions{opacity:1}
+  .card:hover .card-actions,.polaroid:hover .p-actions{opacity:1}
   .card-actions button{
     width:29px;height:29px;border-radius:5px;border:1px solid var(--line);
     background:var(--paper);color:var(--soft);display:flex;align-items:center;justify-content:center;transition:all .2s;
   }
   .card-actions button:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
-  .card-actions button[data-act="del"]:hover,
-  .card-actions button[data-act="aldel"]:hover{background:var(--danger);border-color:var(--danger);color:var(--cream)}
+  .card-actions button[data-act="del"]:hover{background:var(--danger);border-color:var(--danger);color:var(--cream)}
   .card-actions svg{width:13px;height:13px}
   .card-no{font:600 10.5px 'Instrument Sans';letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
   .card-title{font:600 21px/1.25 'Fraunces';margin:9px 0 10px;letter-spacing:-.01em}
@@ -170,7 +166,6 @@
   .empty-sheet h2{font:600 30px/1.2 'Fraunces';margin-bottom:12px}
   .empty-sheet p{font:italic 400 16px/1.7 'Lora';color:var(--soft);margin-bottom:24px}
   .empty-sheet .btn-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-  .empty-note{font:400 14px 'Instrument Sans';color:var(--soft);padding:40px 0 10px;text-align:center}
   .foot{
     display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
     margin-top:56px;padding-top:20px;border-top:1px solid var(--line);
@@ -180,6 +175,7 @@
   #storeStatus{font-weight:600}
   #storeStatus.ok{color:#55705A}
   #storeStatus.warn{color:#B15E36}
+  #verTag{font:700 11px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.05em;color:var(--green);border:1px solid var(--line);border-radius:4px;padding:2px 6px}
   .mini-link{
     border:0;background:transparent;color:var(--soft);padding:0;
     font:600 12px 'Instrument Sans';text-decoration:underline;text-underline-offset:3px;transition:color .2s;
@@ -193,42 +189,21 @@
   }
   .notice-bar b{color:var(--ink)}
 
-  /* ============ ALBUM KENANGAN ============ */
-  .album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px;padding-top:30px}
-  .album-card{
-    position:relative;background:var(--card);border:1px solid var(--line);border-radius:3px;
-    overflow:hidden;cursor:pointer;transform:rotate(var(--rot,0deg));
-    box-shadow:0 1px 0 rgba(41,35,25,.04),0 10px 24px rgba(41,35,25,.07);
-    transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s;
-  }
-  .album-card:hover{transform:rotate(0deg) translateY(-5px);box-shadow:0 18px 38px rgba(41,35,25,.15)}
-  .album-ribbon{
-    position:absolute;top:-1px;left:16px;width:13px;height:40px;background:var(--c,var(--green));
-    clip-path:polygon(0 0,100% 0,100% 100%,50% 76%,0 100%);z-index:2;box-shadow:0 2px 4px rgba(41,35,25,.2);
-  }
-  .album-cover{aspect-ratio:4/3;background:#E7DECA;position:relative;display:flex;align-items:center;justify-content:center;color:var(--soft)}
-  .album-cover img{width:100%;height:100%;object-fit:cover;display:block}
-  .album-cover .ph-icon svg{width:34px;height:34px;opacity:.45}
-  .cover-count{
-    position:absolute;right:10px;bottom:10px;z-index:3;
-    background:rgba(24,21,16,.55);color:var(--cream);
-    font:600 10.5px 'Instrument Sans';letter-spacing:.06em;
-    padding:4px 10px;border-radius:999px;backdrop-filter:blur(2px);
-  }
-  .album-body{padding:15px 18px 14px;border-top:1px solid var(--line)}
-  .album-name{font:600 19px/1.25 'Fraunces';letter-spacing:-.01em}
-  .album-meta{font:400 12.5px 'Instrument Sans';color:var(--soft);margin-top:5px}
-  .album-card-desc{font:italic 400 13.5px/1.5 'Lora';color:var(--soft);margin-top:7px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  /* ============ KENANGAN: dinding foto ============ */
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;padding-top:26px}
+  .chip{border:1px solid var(--line);border-radius:999px;background:transparent;padding:7px 14px;font:500 12.5px 'Instrument Sans';color:var(--soft);transition:all .2s;display:inline-flex;align-items:center;gap:7px}
+  .chip:hover{border-color:var(--green);color:var(--green)}
+  .chip.active{background:var(--green);border-color:var(--green);color:var(--cream)}
+  .chip .mdot{width:7px;height:7px}
+  .album-title{font:600 34px/1.15 'Fraunces';letter-spacing:-.01em}
+  .album-desc{font:italic 400 15px/1.55 'Lora';color:var(--soft);margin-top:7px;max-width:560px}
   .back-link{
     display:inline-flex;align-items:center;gap:8px;margin-top:26px;
     font:600 13px 'Instrument Sans';color:var(--soft);background:transparent;border:0;padding:6px 0;transition:color .2s;
   }
   .back-link:hover{color:var(--green)}
   .back-link svg{width:15px;height:15px}
-  .album-title-row{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-top:10px}
-  .album-title{font:600 34px/1.15 'Fraunces';letter-spacing:-.01em}
-  .album-desc{font:italic 400 15px/1.55 'Lora';color:var(--soft);margin-top:7px;max-width:560px}
-  .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:28px 20px;padding-top:34px}
+  .photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:28px 20px;padding-top:30px}
   .polaroid{
     position:relative;background:#FFFDF6;border:1px solid var(--line);
     padding:10px 10px 12px;cursor:zoom-in;box-shadow:0 8px 20px rgba(41,35,25,.1);
@@ -244,7 +219,6 @@
   }
   .polaroid .pdate{font:500 9.5px 'Instrument Sans';letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-top:6px}
   .p-actions{position:absolute;top:15px;right:15px;display:flex;gap:4px;opacity:0;transition:opacity .25s;z-index:3}
-  .polaroid:hover .p-actions{opacity:1}
   .p-actions button{
     width:28px;height:28px;border-radius:5px;border:1px solid var(--line);
     background:rgba(251,247,236,.92);color:var(--soft);display:flex;align-items:center;justify-content:center;transition:all .2s;
@@ -252,7 +226,7 @@
   .p-actions button:hover{background:var(--ink);color:var(--cream);border-color:var(--ink)}
   .p-actions button[data-pact="del"]:hover{background:var(--danger);border-color:var(--danger);color:var(--cream)}
   .p-actions svg{width:12.5px;height:12.5px}
-  .ph.fail::after,.album-cover.fail::after{
+  .ph.fail::after{
     content:"foto gagal dimuat";position:absolute;inset:0;z-index:2;
     display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;
     font:600 9.5px 'Instrument Sans';letter-spacing:.08em;text-transform:uppercase;color:#8A6A4A;
@@ -437,8 +411,7 @@
   @keyframes blink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
   .chips{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;border-top:1px solid var(--line);scrollbar-width:none}
   .chips::-webkit-scrollbar{display:none}
-  .chip{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;background:transparent;padding:7px 14px;font:500 12.5px 'Instrument Sans';color:var(--soft);transition:all .2s}
-  .chip:hover{border-color:var(--green);color:var(--green)}
+  .chip{flex:0 0 auto}
   .chat-input{display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid var(--line)}
   .chat-input input{flex:1;border:1px solid var(--line);border-radius:999px;background:var(--paper);padding:11px 18px;font:400 14px 'Instrument Sans';outline:0;transition:border-color .25s}
   .chat-input input:focus{border-color:var(--green)}
@@ -498,7 +471,6 @@
     .wordmark{font-size:42px}
     .sheet{padding:26px 22px 24px}
     .board{columns:220px 2}
-    .album-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
   }
   @media(max-width:560px){
     .board{columns:1}
@@ -580,44 +552,42 @@
   </div>
 
   <div id="viewAlbums" hidden>
-    <div id="albumHome">
-      <div class="empty" id="emptyAlbums">
-        <div class="empty-sheet">
-          <i data-lucide="images"></i>
-          <h2>Belum ada album kenangan.</h2>
-          <p>Sesaat berlangsung selama beberapa detik, tetapi kenangan bertahan selamanya.
-          Bikin satu album, lalu isi lewat tombol Tambah foto — fotonya tersimpan di web ini,
-          bisa dilihat dari perangkat mana pun.</p>
-          <button class="btn btn-primary" id="btnFirstAlbum"><i data-lucide="folder-plus"></i>Buat album pertama</button>
-        </div>
-      </div>
-      <div class="notice-bar" id="migBar" hidden>
-        <span id="migText"></span>
-        <button class="btn btn-ghost" id="btnMigrate"><i data-lucide="upload-cloud"></i>Angkut ke gudang</button>
-      </div>
-      <div class="album-grid" id="albumGrid"></div>
+    <div class="notice-bar" id="migBar" hidden>
+      <span id="migText"></span>
+      <button class="btn btn-ghost" id="btnMigrate"><i data-lucide="upload-cloud"></i>Angkut ke gudang</button>
     </div>
-    <div id="albumView" hidden>
-      <button class="back-link" id="btnBackAlbums"><i data-lucide="arrow-left"></i>Semua album</button>
+    <div class="chip-row" id="albumChips"></div>
+    <div id="albumHead" hidden>
+      <button class="back-link" id="btnBackAlbums"><i data-lucide="arrow-left"></i>Semua foto</button>
       <div class="album-title-row">
         <div>
           <h2 class="album-title" id="avTitle"></h2>
           <p class="album-desc" id="avDesc"></p>
         </div>
       </div>
-      <div class="empty" id="emptyAlbumInner">
-        <div class="empty-sheet">
-          <i data-lucide="image-plus"></i>
-          <h2>Album ini masih kosong.</h2>
-          <p>Tambahkan foto pertamamu dari galeri — fotonya akan tersimpan di web ini.
-          Bisa juga seret &amp; lepas, atau tempel dengan Ctrl+V.</p>
-          <div class="btn-row">
-            <button class="btn btn-primary" id="btnAddPhotoInner"><i data-lucide="image-plus"></i>Tambah foto</button>
-          </div>
+    </div>
+    <div class="empty" id="emptyAlbums">
+      <div class="empty-sheet">
+        <i data-lucide="images"></i>
+        <h2>Belum ada album kenangan.</h2>
+        <p>Sesaat berlangsung selama beberapa detik, tetapi kenangan bertahan selamanya.
+        Bikin satu album dulu, lalu isi dengan foto-fotomu — tersimpan di web ini,
+        bisa dilihat dari perangkat mana pun.</p>
+        <button class="btn btn-primary" id="btnFirstAlbum"><i data-lucide="folder-plus"></i>Buat album pertama</button>
+      </div>
+    </div>
+    <div class="empty" id="emptyAlbumInner">
+      <div class="empty-sheet">
+        <i data-lucide="image-plus"></i>
+        <h2>Belum ada foto di sini.</h2>
+        <p>Pilih dulu album di baris pil di atas, lalu klik Tambah foto dan pilih fotomu dari galeri.
+        Bisa juga seret &amp; lepas, atau tempel dengan Ctrl+V.</p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnAddPhotoInner"><i data-lucide="image-plus"></i>Tambah foto</button>
         </div>
       </div>
-      <div class="photo-grid" id="photoGrid"></div>
     </div>
+    <div class="photo-grid" id="photoGrid"></div>
   </div>
 
   <footer class="foot">
@@ -625,6 +595,8 @@
     <span>Curhatan &amp; foto tersimpan di web — sinkron di semua perangkatmu.</span>
     <span>·</span>
     <span id="storeStatus">menyambung…</span>
+    <span>·</span>
+    <span id="verTag"></span>
     <span>·</span>
     <button type="button" class="mini-link" id="btnReload">Muat ulang</button>
     <button type="button" class="mini-link" id="btnLogout">Keluar</button>
@@ -802,10 +774,9 @@
 
 <script>
 /* ================= KONFIG (sudah terisi) ================= */
+const APP_VERSION = 'v3';
 const SUPABASE_URL = 'https://hepaktfsynslilmooswc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_KaVx4gMZGBDoyK6FGU8fwA_eKVCRQ5q';
-const CONFIG_OK = /^https:\/\/[a-z0-9-]+\.supabase\.co/i.test(SUPABASE_URL)
-  && SUPABASE_ANON_KEY.length > 20;
 
 let sb = null;
 
@@ -844,11 +815,11 @@ const ui = {
   folder:'all', q:'', editingId:null, freshId:null,
   view:'notes', album:null,
   editingAlbum:null, alColor:FOLDER_COLORS[0],
-  lbIdx:-1,
+  lbIdx:-1, lbList:null,
 };
 
 /* ==================================================================
-   GUDANG AWAN (Supabase) — catatan & foto tersimpan di web
+   GUDANG AWAN (Supabase)
    ================================================================== */
 let offlineMode = false;
 let userEmail = '';
@@ -979,8 +950,7 @@ function hideGate(){
   document.body.classList.remove('locked');
 }
 
-/* ================= DATA LOKAL LAMA (buat migrasi) ================= */
-let legacySnapshot = null;
+/* ================= DATA LOKAL LAMA (migrasi) ================= */
 function snapshotLegacy(){
   try{
     if(localStorage.getItem('tumpuk_migrated')) return;
@@ -989,12 +959,10 @@ function snapshotLegacy(){
     const s = JSON.parse(raw);
     const hasData = (s.entries && s.entries.length) || (s.albums && s.albums.length);
     if(!hasData) return;
-    legacySnapshot = s;
     localStorage.setItem('tumpuk_legacy_backup', raw);
   }catch(e){}
 }
 function legacyFromBackup(){
-  if(legacySnapshot) return legacySnapshot;
   try{
     const raw = localStorage.getItem('tumpuk_legacy_backup');
     return raw ? JSON.parse(raw) : null;
@@ -1030,20 +998,6 @@ async function legacyFiles(){
       rq.onerror = () => res();
     }catch(e){ res(); }
   });
-  try{
-    if(navigator.storage && navigator.storage.getDirectory){
-      const root = await navigator.storage.getDirectory();
-      const names = [];
-      for await (const name of (root.keys ? root.keys() : [])) names.push(name);
-      for(const name of names){
-        if(map.has(name)) continue;
-        try{
-          const fh = await root.getFileHandle(name);
-          map.set(name, await fh.getFile());
-        }catch(e){}
-      }
-    }
-  }catch(e){}
   return map;
 }
 function toBlob(v){
@@ -1056,8 +1010,6 @@ function toBlob(v){
   for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
   return new Blob([arr], {type: mime});
 }
-
-/* ================= MIGRASI: angkut data lama ke gudang ================= */
 function maybeOfferMigration(){
   const snap = legacyFromBackup();
   const bar = $('#migBar');
@@ -1066,7 +1018,7 @@ function maybeOfferMigration(){
   const nP = (snap.albums||[]).reduce((s,a)=>s+((a.photos||[]).length),0);
   if(!nE && !nA) return;
   $('#migText').innerHTML =
-    `Ada <b>${nE} lembar curhatan</b> &amp; <b>${nP} foto</b> di ${nA} album dari perangkat ini (versi lama).
+    `Ada <b>${nE} lembar curhatan</b> &amp; <b>${nP} foto</b> dari versi lama di perangkat ini.
      Angkut semuanya ke gudang awan biar ikut tersinkron?`;
   bar.hidden = false;
 }
@@ -1119,7 +1071,6 @@ async function migrateLegacy(){
     await cloud(sb.from('meta').upsert({key:'nextNo', value: snap.nextNo || 1}), true);
 
     localStorage.setItem('tumpuk_migrated', '1');
-    legacySnapshot = null;
     localStorage.removeItem('tumpuk_legacy_backup');
     await cloudLoadAll();
     renderAll(); icons();
@@ -1208,7 +1159,7 @@ async function handleFiles(fileList){
   const files = Array.from(fileList || []);   /* WAJIB baris pertama, sebelum await apa pun */
   if(!files.length){ showToast('Tidak ada file yang terpilih.'); return; }
   const album = state.albums.find(a => a.id === ui.album);
-  if(!album){ showToast('Buka dulu albumnya, lalu tambahkan foto.'); return; }
+  if(!album){ showToast('Pilih dulu albumnya di baris pil di atas, ya.'); return; }
   if(offlineMode){ showToast('Sedang luring — sambungkan internet dulu untuk mengunggah foto.'); return; }
   let ok = 0;
   const gagal = [];
@@ -1229,7 +1180,7 @@ async function handleFiles(fileList){
       await cloud(sb.from('photos').insert({id, album_id:album.id, caption:'', ts:new Date().toISOString()}));
       await cloud(sb.from('albums').update({cover:album.cover}).eq('id', album.id), true);
       save(); ok++;
-      if(ui.view === 'albums' && ui.album === album.id) renderAlbumPhotos();
+      if(ui.view === 'albums') renderAlbumsView();
     }catch(err){
       console.error('Tumpuk — upload gagal: "' + (f.name || '(tanpa nama)') + '" | tipe: ' + (f.type || '(kosong)') + ' | alasan:', err);
       gagal.push({file: f, reason: (err && err.message) || 'tidak diketahui'});
@@ -1246,17 +1197,23 @@ async function handleFiles(fileList){
   }
 }
 
-/* penanda visual: gambar gagal dimuat → kotaknya jujur */
+/* gambar gagal → coba URL ukuran penuh dulu, baru tandai gagal */
 document.addEventListener('error', e => {
   const t = e.target;
   if(!(t instanceof HTMLImageElement)) return;
-  const box = t.closest('.ph') || t.closest('.album-cover');
-  if(box) box.classList.add('fail');
+  const box = t.closest('.ph') || t.closest('.lb-stage');
+  const src = t.getAttribute('src') || '';
+  if(!t.dataset.retried && src.indexOf('_t.jpg') !== -1){
+    t.dataset.retried = '1';
+    t.src = src.replace('_t.jpg', '.jpg');
+    return;
+  }
+  if(box && box.classList && box.classList.contains('ph')) box.classList.add('fail');
 }, true);
 document.addEventListener('load', e => {
   const t = e.target;
   if(!(t instanceof HTMLImageElement)) return;
-  const box = t.closest('.ph') || t.closest('.album-cover');
+  const box = t.closest('.ph');
   if(box) box.classList.remove('fail');
 }, true);
 
@@ -1323,8 +1280,8 @@ function renderHeaderForView(){
   $$('#viewSwitch button').forEach(b => b.classList.toggle('active', b.dataset.view === ui.view));
   $('#searchWrap').hidden   = !notes;
   $('#btnWrite').hidden     = !notes;
-  $('#btnNewAlbum').hidden  = !(ui.view === 'albums' && !inAlbum);
-  $('#btnAddPhoto').hidden  = !inAlbum;
+  $('#btnNewAlbum').hidden  = notes;
+  $('#btnAddPhoto').hidden  = notes;
   $('#btnEditAlbum').hidden = !inAlbum;
   $('#tagline').textContent = notes
     ? 'Letakkan isi hati di sini — lembar demi lembar, tanpa ada yang menilai.'
@@ -1350,8 +1307,8 @@ function renderAll(){
 /* ================= SPINE ================= */
 function renderSpine(){
   if(ui.view === 'albums'){
-    let html = `<button class="tab ${ui.album===null?'active':''}" data-ahome="1" title="Semua album">
-      <span class="tdot" style="--c:#292319"></span><span class="tname">Album</span></button>`;
+    let html = `<button class="tab ${ui.album===null?'active':''}" data-a="" title="Semua foto">
+      <span class="tdot" style="--c:#292319"></span><span class="tname">Semua</span></button>`;
     state.albums.forEach(a => {
       html += `<button class="tab ${ui.album===a.id?'active':''}" data-a="${a.id}" title="${esc(a.name)} — ${a.photos.length} foto">
         <span class="tdot" style="--c:${a.color}"></span><span class="tname">${esc(a.name)}</span></button>`;
@@ -1609,27 +1566,32 @@ function openFolderModal(){
 });
  $('#folderName').addEventListener('keydown', e => { if(e.key==='Enter') $('#btnSaveFolder').click(); });
 
-/* ================= ALBUM KENANGAN ================= */
-function albumCardHTML(a){
-  const rot = ((hash(a.id) % 7) - 3) * 0.35;
-  const since = new Date(a.ts).toLocaleDateString('id-ID', {month:'long', year:'numeric'});
-  const cover = a.cover
-    ? `<img src="${esc(fotoURL(a.cover, true))}" alt="Sampul ${esc(a.name)}">`
-    : `<span class="ph-icon"><i data-lucide="images"></i></span>`;
-  return `<article class="album-card" data-al="${a.id}" style="--rot:${rot}deg;--c:${a.color}">
-    <span class="album-ribbon"></span>
-    <div class="album-cover">${cover}<span class="cover-count">${a.photos.length} foto</span></div>
-    <div class="card-actions">
-      <button data-act="aledit" title="Sunting album" aria-label="Sunting album"><i data-lucide="pencil"></i></button>
-      <button data-act="aldel" title="Hapus album" aria-label="Hapus album"><i data-lucide="trash-2"></i></button>
-    </div>
-    <div class="album-body">
-      <h3 class="album-name">${esc(a.name)}</h3>
-      <p class="album-meta">Sejak ${since}</p>
-      ${a.desc ? `<p class="album-card-desc">${esc(a.desc)}</p>` : ''}
-    </div>
-  </article>`;
+/* ================= KENANGAN: dinding foto ================= */
+function currentList(){
+  if(ui.album){
+    const a = state.albums.find(x => x.id === ui.album);
+    return a ? a.photos.map(p => ({p, albumId:a.id})) : [];
+  }
+  const out = [];
+  state.albums.forEach(al => al.photos.forEach(p => out.push({p, albumId:al.id})));
+  return out.sort((x,y) => y.p.ts - x.p.ts);
 }
+function renderAlbumChips(){
+  let html = `<button class="chip ${ui.album===null?'active':''}" data-ca="">Semua foto</button>`;
+  state.albums.forEach(al => {
+    html += `<button class="chip ${ui.album===al.id?'active':''}" data-ca="${al.id}">
+      <span class="mdot" style="--c:${al.color}"></span>${esc(al.name)} · ${al.photos.length}</button>`;
+  });
+  html += `<button class="chip" data-ca-add="1"><i data-lucide="plus"></i>Album</button>`;
+  $('#albumChips').innerHTML = html;
+  icons();
+}
+ $('#albumChips').addEventListener('click', e => {
+  if(e.target.closest('[data-ca-add]')){ openAlbumModal(null); return; }
+  const c = e.target.closest('[data-ca]'); if(!c) return;
+  ui.album = c.dataset.ca || null;
+  renderAll();
+});
 function polaroidHTML(p, idx){
   const rot = ((hash(p.id) % 7) - 3) * 0.5;
   const d = new Date(p.ts).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
@@ -1645,68 +1607,54 @@ function polaroidHTML(p, idx){
 }
 function renderAlbumsView(){
   const a = ui.album ? state.albums.find(x => x.id === ui.album) : null;
-  if(!a){
-    $('#albumHome').hidden = false;
-    $('#albumView').hidden = true;
-    const total = state.albums.reduce((s,x) => s + x.photos.length, 0);
-    $('#statText').textContent = `${state.albums.length} album · ${total} foto kenangan`;
-    $('#filterLabel').textContent = 'Semua kenangan';
-    const list = [...state.albums].sort((x,y) => y.ts - x.ts);
-    $('#emptyAlbums').classList.toggle('show', list.length === 0);
-    $('#albumGrid').innerHTML = list.map(albumCardHTML).join('');
-  } else {
-    $('#albumHome').hidden = true;
-    $('#albumView').hidden = false;
+  $('#albumHead').hidden = !a;
+  if(a){
     $('#avTitle').textContent = a.name;
     $('#avDesc').textContent = a.desc || '';
     $('#avDesc').hidden = !a.desc;
-    $('#statText').textContent = `${a.photos.length} foto di album ini`;
-    $('#filterLabel').textContent = a.name;
-    renderAlbumPhotos();
   }
+  renderAlbumChips();
+  const list = currentList();
+  const total = state.albums.reduce((s,x) => s + x.photos.length, 0);
+  $('#statText').textContent = a
+    ? `${a.photos.length} foto di album ini`
+    : `${total} foto · ${state.albums.length} album`;
+  $('#filterLabel').textContent = a ? a.name : 'Semua kenangan';
+  $('#emptyAlbums').classList.toggle('show', state.albums.length === 0);
+  $('#emptyAlbumInner').classList.toggle('show', state.albums.length > 0 && list.length === 0);
+  $('#photoGrid').innerHTML = list.map((item,i) => polaroidHTML(item.p, i)).join('');
   icons();
 }
-function renderAlbumPhotos(){
-  const a = state.albums.find(x => x.id === ui.album); if(!a) return;
-  $('#emptyAlbumInner').classList.toggle('show', a.photos.length === 0);
-  $('#photoGrid').innerHTML = a.photos.map((p,i) => polaroidHTML(p,i)).join('');
-  icons();
-}
- $('#albumGrid').addEventListener('click', e => {
-  const card = e.target.closest('.album-card'); if(!card) return;
-  const id = card.dataset.al;
-  const act = e.target.closest('[data-act]');
-  if(act){
-    if(act.dataset.act === 'aledit') openAlbumModal(id);
-    else deleteAlbum(id);
-    return;
-  }
-  ui.album = id;
-  renderAll();
-});
  $('#photoGrid').addEventListener('click', e => {
   const fig = e.target.closest('.polaroid'); if(!fig) return;
   const idx = Number(fig.dataset.idx);
-  const a = state.albums.find(x => x.id === ui.album); if(!a) return;
+  const list = currentList();
+  const item = list[idx]; if(!item) return;
   const act = e.target.closest('[data-pact]');
   if(act){
-    const p = a.photos[idx];
+    const a = state.albums.find(x => x.id === item.albumId);
     if(act.dataset.pact === 'cover'){
-      a.cover = p.id; save();
+      if(!a){ showToast('Album fotonya tidak ditemukan.'); return; }
+      a.cover = item.p.id; save();
       cloud(sb.from('albums').update({cover:a.cover}).eq('id', a.id), true);
-      renderAlbumPhotos();
       showToast('Sampul album diperbarui.');
-    } else askDeletePhoto(idx);
+    } else askDeletePhotoItem(item);
     return;
   }
-  openLightbox(idx);
+  openLightbox(list, idx);
 });
  $('#btnBackAlbums').addEventListener('click', () => { ui.album = null; renderAll(); });
  $('#btnNewAlbum').addEventListener('click', () => openAlbumModal(null));
  $('#btnFirstAlbum').addEventListener('click', () => openAlbumModal(null));
  $('#btnEditAlbum').addEventListener('click', () => openAlbumModal(ui.album));
- $('#btnAddPhoto').addEventListener('click', () => $('#photoInput').click());
- $('#btnAddPhotoInner').addEventListener('click', () => $('#photoInput').click());
+ $('#btnAddPhoto').addEventListener('click', () => {
+  if(!ui.album){ showToast('Pilih dulu albumnya di baris pil di atas, ya.'); return; }
+  $('#photoInput').click();
+});
+ $('#btnAddPhotoInner').addEventListener('click', () => {
+  if(!ui.album){ showToast('Pilih dulu albumnya di baris pil di atas, ya.'); return; }
+  $('#photoInput').click();
+});
  $('#photoInput').addEventListener('change', e => {
   const picked = e.target.files ? Array.from(e.target.files) : [];  /* salin dulu */
   e.target.value = '';
@@ -1786,14 +1734,14 @@ function deleteAlbum(id){
       showToast('Album dihapus.');
     });
 }
-function askDeletePhoto(idx){
-  const a = state.albums.find(x => x.id === ui.album); if(!a) return;
-  const p = a.photos[idx]; if(!p) return;
+function askDeletePhotoItem(item){
+  const a = state.albums.find(x => x.id === item.albumId); if(!a) return;
+  const idx = a.photos.indexOf(item.p); if(idx < 0) return;
   openConfirm('Hapus foto ini?', 'Foto akan dihapus dari album dan dari web ini.', async () => {
-    if(!offlineMode) cloud(sb.storage.from('tumpuk').remove([`${p.id}.jpg`, `${p.id}_t.jpg`]), true);
-    cloud(sb.from('photos').delete().eq('id', p.id));
+    if(!offlineMode) cloud(sb.storage.from('tumpuk').remove([`${item.p.id}.jpg`, `${item.p.id}_t.jpg`]), true);
+    cloud(sb.from('photos').delete().eq('id', item.p.id));
     a.photos.splice(idx, 1);
-    if(a.cover && a.cover === p.id){
+    if(a.cover && a.cover === item.p.id){
       a.cover = a.photos.length ? a.photos[a.photos.length-1].id : null;
       cloud(sb.from('albums').update({cover:a.cover}).eq('id', a.id), true);
     }
@@ -1831,68 +1779,70 @@ document.addEventListener('paste', e => {
 });
 
 /* ================= LIGHTBOX ================= */
-function openLightbox(idx){
-  const a = state.albums.find(x => x.id === ui.album);
-  if(!a || !a.photos[idx]) return;
+function openLightbox(list, idx){
+  if(!list || !list[idx]) return;
+  ui.lbList = list;
   ui.lbIdx = idx;
   renderLightbox();
   $('#lightbox').classList.add('open');
   document.body.classList.add('locked');
 }
 function renderLightbox(){
-  const a = state.albums.find(x => x.id === ui.album); if(!a) return;
-  const p = a.photos[ui.lbIdx]; if(!p) return;
+  const item = (ui.lbList || [])[ui.lbIdx]; if(!item) return;
+  const a = state.albums.find(x => x.id === item.albumId);
+  const p = item.p;
   const d = new Date(p.ts).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-  $('#lbCount').textContent = `${ui.lbIdx+1} / ${a.photos.length} · ${d}`;
-  $('#lbPrev').style.display = a.photos.length > 1 ? '' : 'none';
-  $('#lbNext').style.display = a.photos.length > 1 ? '' : 'none';
+  $('#lbCount').textContent = `${ui.lbIdx+1} / ${ui.lbList.length} · ${d}`;
+  $('#lbPrev').style.display = ui.lbList.length > 1 ? '' : 'none';
+  $('#lbNext').style.display = ui.lbList.length > 1 ? '' : 'none';
   const img = $('#lbImg');
   img.style.opacity = 0;
   img.onload = () => { img.style.opacity = 1; };
   img.src = fotoURL(p.id);
   $('#lbCaption').value = p.caption || '';
-  $('#lbCoverBtn').classList.toggle('active', a.cover === p.id);
+  $('#lbCoverBtn').classList.toggle('active', !!(a && a.cover === p.id));
 }
 function lbNav(dir){
-  const a = state.albums.find(x => x.id === ui.album); if(!a || !a.photos.length) return;
-  ui.lbIdx = (ui.lbIdx + dir + a.photos.length) % a.photos.length;
+  if(!ui.lbList || !ui.lbList.length) return;
+  ui.lbIdx = (ui.lbIdx + dir + ui.lbList.length) % ui.lbList.length;
   renderLightbox();
 }
 function closeLb(){
   $('#lightbox').classList.remove('open');
   if(!document.querySelector('.overlay.open') && $('#gate').hidden) document.body.classList.remove('locked');
-  ui.lbIdx = -1;
+  ui.lbIdx = -1; ui.lbList = null;
 }
  $('#lbPrev').addEventListener('click', () => lbNav(-1));
  $('#lbNext').addEventListener('click', () => lbNav(1));
  $('#lbClose').addEventListener('click', closeLb);
  $('#lbStage').addEventListener('click', e => { if(e.target === e.currentTarget) closeLb(); });
- $('#lbDel').addEventListener('click', () => { if(ui.lbIdx >= 0) askDeletePhoto(ui.lbIdx); });
+ $('#lbDel').addEventListener('click', () => {
+  const item = (ui.lbList || [])[ui.lbIdx];
+  if(item) askDeletePhotoItem(item);
+});
  $('#lbCoverBtn').addEventListener('click', () => {
-  const a = state.albums.find(x => x.id === ui.album);
-  const p = a && a.photos[ui.lbIdx]; if(!p) return;
-  a.cover = p.id; save();
+  const item = (ui.lbList || [])[ui.lbIdx]; if(!item) return;
+  const a = state.albums.find(x => x.id === item.albumId); if(!a) return;
+  a.cover = item.p.id; save();
   cloud(sb.from('albums').update({cover:a.cover}).eq('id', a.id), true);
-  renderAlbumPhotos();
+  renderAlbumsView();
   renderLightbox();
   showToast('Sampul album diperbarui.');
 });
  $('#lbDl').addEventListener('click', () => {
-  const a = state.albums.find(x => x.id === ui.album);
-  const p = a && a.photos[ui.lbIdx]; if(!p) return;
+  const item = (ui.lbList || [])[ui.lbIdx]; if(!item) return;
   const el = document.createElement('a');
-  el.href = fotoURL(p.id);
-  el.download = p.id + '.jpg';
+  el.href = fotoURL(item.p.id);
+  el.download = item.p.id + '.jpg';
   el.target = '_blank';
   document.body.appendChild(el); el.click(); el.remove();
 });
  $('#lbCaption').addEventListener('change', () => {
-  const a = state.albums.find(x => x.id === ui.album);
-  const p = a && a.photos[ui.lbIdx]; if(!p) return;
-  p.caption = $('#lbCaption').value.trim().slice(0, 120);
+  const item = (ui.lbList || [])[ui.lbIdx]; if(!item) return;
+  item.p.caption = $('#lbCaption').value.trim().slice(0, 120);
   save();
-  cloud(sb.from('photos').update({caption:p.caption}).eq('id', p.id), true);
-  renderAlbumPhotos();
+  cloud(sb.from('photos').update({caption:item.p.caption}).eq('id', item.p.id), true);
+  renderAlbumsView();
 });
  $('#lbCaption').addEventListener('keydown', e => { if(e.key === 'Enter') e.target.blur(); });
 let touchX = null;
@@ -1950,7 +1900,7 @@ function aiReply(raw){
   if(/(kamu siapa|siapa kamu|kamu robot|kamu ai|tentang kamu)/.test(t))
     return [{text:'Aku Kancil — pendengar kecil yang tinggal di sudut web ini. Aku tidak akan menilai, dan ceritamu tidak pernah keluar dari perangkat ini. Aku cuma di sini untuk mendengarkan, menjawab pertanyaan, atau sekadar menemani.'}];
   if(/(fitur|cara pakai|web ini|situs ini|jilid itu|tumpuk|album|kenangan|foto|sinkron)/.test(t))
-    return [{text:'Web ini meja pribadimu: di tab "Curhatan" kamu bisa menulis lembar curhat sebanyak apa pun dan menyusunnya ke jilid, di tab "Kenangan" kamu bisa bikin album dan mengunggah foto langsung dari galeri. Semuanya tersimpan di web dan muncul otomatis di semua perangkatmu — HP maupun laptop.'}];
+    return [{text:'Web ini meja pribadimu: tab "Curhatan" isinya catatan tulisanmu yang bisa disusun ke jilid, sedangkan tab "Kenangan" langsung menampilkan dinding fotomu — album-albumnya jadi filter di baris pil di atasnya. Semuanya tersimpan di web dan muncul otomatis di semua perangkatmu.'}];
   if(/(capek|lelah|penat|burnout|stres|stress|pegel|remuk|drained)/.test(t))
     return [{text:'Kamu sedang menopang banyak hal sekaligus, ya. Capek itu sah — dan bukan tanda kamu lemah.'},
             {text:'Coba tarik napas sebentar bareng aku. Satu menit saja, janji.', action:true}];
@@ -2115,6 +2065,8 @@ function finishBreath(){
 
 /* ================= BOOT ================= */
 (function boot(){
+  console.log('Tumpuk — versi:', APP_VERSION);
+  $('#verTag').textContent = APP_VERSION;
   try{ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
   catch(e){ $('#gateBody').innerHTML = '<p class="gate-sub">Konfigurasi Supabase salah — cek kembali Project URL dan key.</p>'; return; }
   snapshotLegacy();
