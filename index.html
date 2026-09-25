@@ -863,7 +863,7 @@ function updateStoreStatus(){
 }
 async function cloud(fn, silent){
   try{
-    const r = await fn();
+    const r = await fn;
     if(r && r.error){
       console.error('Gudang:', r.error);
       if(!silent) showToast('Gagal sinkron: ' + r.error.message);
