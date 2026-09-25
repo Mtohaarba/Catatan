@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --paper:#F2EBDB; --card:#FBF7EC; --ink:#292319; --soft:#5F584A;
@@ -28,6 +29,35 @@
   input,textarea,select{font-family:inherit;color:var(--ink)}
   svg{display:block}
   img{-webkit-user-drag:none;user-select:none}
+
+  /* ============ GERBANG ============ */
+  #gate{
+    position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;
+    background:var(--paper);padding:24px;
+  }
+  .gate-card{
+    position:relative;z-index:1;width:min(420px,94vw);background:var(--card);border:1px solid var(--line);
+    border-radius:6px;padding:38px 36px 30px;box-shadow:0 24px 60px rgba(31,27,21,.18);
+    transform:rotate(-.6deg);text-align:center;
+  }
+  .gate-card .wordmark{font:900 44px/1 'Fraunces';letter-spacing:-.02em}
+  .gate-card .wordmark em{font-style:normal;color:var(--green)}
+  .gate-sub{font:italic 400 14.5px/1.6 'Lora';color:var(--soft);margin:12px 0 22px}
+  .gate-tabs{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;margin-bottom:18px}
+  .gate-tabs button{border:0;background:transparent;padding:7px 20px;border-radius:999px;font:600 13px 'Instrument Sans';color:var(--soft)}
+  .gate-tabs button.active{background:var(--green);color:var(--cream)}
+  .gate-field{
+    width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;
+    padding:11px 2px;font:400 15.5px 'Instrument Sans';outline:0;margin-bottom:6px;text-align:left;
+  }
+  .gate-field:focus{border-color:var(--green)}
+  #gGo{width:100%;justify-content:center;margin-top:14px}
+  #gErr{font:500 12.5px 'Instrument Sans';color:var(--danger);min-height:18px;margin-top:10px}
+  .gate-steps{text-align:left;font:400 13px/1.75 'Instrument Sans';color:var(--soft)}
+  .gate-steps b{color:var(--ink)}
+  .gate-steps code{font:600 12px ui-monospace,Menlo,Consolas,monospace;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+  .spin{width:30px;height:30px;border-radius:50%;margin:0 auto 16px;border:3px solid var(--line);border-top-color:var(--green);animation:spin 1s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
   /* ============ SPINE ============ */
   .spine{
@@ -139,6 +169,7 @@
   .empty-sheet svg{width:26px;height:26px;color:var(--green);margin:0 auto 18px}
   .empty-sheet h2{font:600 30px/1.2 'Fraunces';margin-bottom:12px}
   .empty-sheet p{font:italic 400 16px/1.7 'Lora';color:var(--soft);margin-bottom:24px}
+  .empty-sheet .btn-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
   .empty-note{font:400 14px 'Instrument Sans';color:var(--soft);padding:40px 0 10px;text-align:center}
   .foot{
     display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
@@ -149,17 +180,18 @@
   #storeStatus{font-weight:600}
   #storeStatus.ok{color:#55705A}
   #storeStatus.warn{color:#B15E36}
-  .diag-btn{
+  .mini-link{
     border:0;background:transparent;color:var(--soft);padding:0;
-    font:600 12px 'Instrument Sans';text-decoration:underline;text-underline-offset:3px;
-    transition:color .2s;
+    font:600 12px 'Instrument Sans';text-decoration:underline;text-underline-offset:3px;transition:color .2s;
   }
-  .diag-btn:hover{color:var(--green)}
-  .diag-out{
-    font:12px/1.65 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;
-    background:var(--paper);border:1px solid var(--line);border-radius:6px;
-    padding:14px 16px;max-height:46vh;overflow:auto;
+  .mini-link:hover{color:var(--green)}
+
+  .notice-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    margin-top:26px;padding:14px 18px;background:var(--card);border:1px solid var(--line);
+    border-radius:8px;font:400 13.5px 'Instrument Sans';color:var(--soft);
   }
+  .notice-bar b{color:var(--ink)}
 
   /* ============ ALBUM KENANGAN ============ */
   .album-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px;padding-top:30px}
@@ -444,7 +476,7 @@
     display:flex;align-items:center;gap:16px;background:var(--ink);color:var(--cream);
     border-radius:8px;padding:13px 20px;box-shadow:0 16px 40px rgba(31,27,21,.4);
     font:500 13.5px 'Instrument Sans';opacity:0;transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .4s;
-    max-width:min(520px,90vw);
+    max-width:min(560px,90vw);
   }
   #toast.show{transform:translate(-50%,0);opacity:1}
   #toastAct{border:0;background:transparent;color:#C9A96A;font:700 13px 'Instrument Sans';letter-spacing:.03em;padding:2px 4px;white-space:nowrap}
@@ -483,10 +515,19 @@
     .lb-top{padding:12px 14px}
     .lb-btn{width:35px;height:35px}
     #chatFab{right:16px;bottom:16px;padding:13px 18px}
+    .gate-card{padding:30px 22px 24px}
   }
 </style>
 </head>
 <body>
+
+<!-- ============ GERBANG ============ -->
+<div id="gate">
+  <div class="gate-card">
+    <h1 class="wordmark">Tumpuk<em>.</em></h1>
+    <div id="gateBody"></div>
+  </div>
+</div>
 
 <nav class="spine" id="spine" aria-label="Navigasi koleksi"></nav>
 
@@ -544,10 +585,15 @@
         <div class="empty-sheet">
           <i data-lucide="images"></i>
           <h2>Belum ada album kenangan.</h2>
-          <p>Foto-foto yang bikin kamu senyum layak punya tempat.
-          Sesaat berlangsung selama beberapa detik, tetapi kenangan bertahan selamanya.</p>
+          <p>Sesaat berlangsung selama beberapa detik, tetapi kenangan bertahan selamanya.
+          Bikin satu album, lalu isi lewat tombol Tambah foto — fotonya tersimpan di web ini,
+          bisa dilihat dari perangkat mana pun.</p>
           <button class="btn btn-primary" id="btnFirstAlbum"><i data-lucide="folder-plus"></i>Buat album pertama</button>
         </div>
+      </div>
+      <div class="notice-bar" id="migBar" hidden>
+        <span id="migText"></span>
+        <button class="btn btn-ghost" id="btnMigrate"><i data-lucide="upload-cloud"></i>Angkut ke gudang</button>
       </div>
       <div class="album-grid" id="albumGrid"></div>
     </div>
@@ -563,9 +609,11 @@
         <div class="empty-sheet">
           <i data-lucide="image-plus"></i>
           <h2>Album ini masih kosong.</h2>
-          <p>Tambahkan foto pertamamu dari galeri. Dari laptop, kamu juga bisa
-          seret &amp; lepas fotonya langsung ke halaman ini — atau tempel dengan Ctrl+V.</p>
-          <button class="btn btn-primary" id="btnAddPhotoInner"><i data-lucide="image-plus"></i>Tambah foto</button>
+          <p>Tambahkan foto pertamamu dari galeri — fotonya akan tersimpan di web ini.
+          Bisa juga seret &amp; lepas, atau tempel dengan Ctrl+V.</p>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btnAddPhotoInner"><i data-lucide="image-plus"></i>Tambah foto</button>
+          </div>
         </div>
       </div>
       <div class="photo-grid" id="photoGrid"></div>
@@ -573,12 +621,13 @@
   </div>
 
   <footer class="foot">
-    <i data-lucide="lock"></i>
-    <span>Semua catatan &amp; foto tersimpan lokal di peramban ini.</span>
+    <i data-lucide="cloud"></i>
+    <span>Curhatan &amp; foto tersimpan di web — sinkron di semua perangkatmu.</span>
     <span>·</span>
-    <span id="storeStatus">memeriksa penyimpanan foto…</span>
+    <span id="storeStatus">menyambung…</span>
     <span>·</span>
-    <button type="button" class="diag-btn" id="btnDiag">Diagnos penyimpanan</button>
+    <button type="button" class="mini-link" id="btnReload">Muat ulang</button>
+    <button type="button" class="mini-link" id="btnLogout">Keluar</button>
   </footer>
 </div>
 
@@ -685,21 +734,6 @@
   </div>
 </div>
 
-<!-- ============ DIAGNOS PENYIMPANAN ============ -->
-<div class="overlay" id="diagOverlay" style="z-index:82">
-  <div class="sheet small" style="width:min(540px,94vw)">
-    <div class="sheet-head">
-      <span class="eyebrow">Diagnos penyimpanan foto</span>
-      <button class="close-x" data-close="diagOverlay" aria-label="Tutup"><i data-lucide="x"></i></button>
-    </div>
-    <pre class="diag-out" id="diagOut">Menjalankan pemeriksaan…</pre>
-    <div class="confirm-row" style="margin-top:18px">
-      <button class="btn btn-ghost" id="btnDiagAgain">Periksa ulang</button>
-      <button class="btn btn-primary" data-close="diagOverlay">Tutup</button>
-    </div>
-  </div>
-</div>
-
 <!-- ============ LATIHAN NAPAS ============ -->
 <div class="overlay" id="breathOverlay">
   <div class="b-wrap">
@@ -761,12 +795,21 @@
 <button id="chatFab"><i data-lucide="message-circle"></i>Kancil</button>
 
 <div class="drop-hint" id="dropHint">
-  <div class="drop-card"><i data-lucide="image-plus"></i>Lepas foto di sini untuk menambahkannya</div>
+  <div class="drop-card"><i data-lucide="image-plus"></i>Lepas foto di sini — tersimpan di web ini</div>
 </div>
 
 <div id="toast"><span id="toastMsg"></span><button id="toastAct"></button></div>
 
 <script>
+/* ================= KONFIG ================= */
+const SUPABASE_URL = 'https://hepaktfsynslilmooswc.supabase.co/rest/v1/';        /* ← ISI DI SINI */
+const SUPABASE_ANON_KEY = 'sb_publishable_KaVx4gMZGBDoyK6FGU8fwA_eKVCRQ5q';      /* ← ISI DI SINI */
+const CONFIG_OK = /^https:\/\/[a-z0-9-]+\.supabase\.co/i.test(SUPABASE_URL)
+  && SUPABASE_ANON_KEY.length > 60
+  && !SUPABASE_ANON_KEY.includes('TEMPEL');
+
+let sb = null;
+
 /* ================= UTIL ================= */
 const $  = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -783,41 +826,20 @@ const MOODS = {
   bingung:{label:'Bingung', c:'#8A7A55'}, rindu:{label:'Rindu', c:'#8A5C6E'},
 };
 const FOLDER_COLORS = ['#55705A','#B15E36','#5C7A8A','#8A5C6E','#A98A3F'];
+const defaultFolders = () => ([
+  {id:uid(), name:'Harian', color:FOLDER_COLORS[0], custom:true},
+  {id:uid(), name:'Yang Berat', color:FOLDER_COLORS[2], custom:true},
+  {id:uid(), name:'Hal Kecil yang Baik', color:FOLDER_COLORS[4], custom:true},
+]);
+const defaultsChat = () => ([
+  {role:'ai', text:'Halo. Aku Kancil — pendengar kecil yang tinggal di sudut web ini.', ts:Date.now()},
+  {role:'ai', text:'Kalau kepalamu terlalu penuh, ceritakan saja di sini. Kalau cuma mau tanya-tanya, juga boleh. Mulai dari mana?', ts:Date.now()},
+]);
 
 /* ================= STATE ================= */
 const LS = 'tumpuk_v1';
-function defaults(){
-  return {
-    nextNo:1, entries:[], albums:[],
-    folders:[
-      {id:uid(), name:'Harian', color:FOLDER_COLORS[0]},
-      {id:uid(), name:'Yang Berat', color:FOLDER_COLORS[2]},
-      {id:uid(), name:'Hal Kecil yang Baik', color:FOLDER_COLORS[4]},
-    ],
-    chat:[]
-  };
-}
-let state;
-try{
-  const raw = localStorage.getItem(LS);
-  state = raw ? JSON.parse(raw) : null;
-}catch(e){ state = null; }
-if(!state || !state.folders) state = defaults();
-if(!Array.isArray(state.albums)) state.albums = [];
-state.albums.forEach(a => {
-  if(!Array.isArray(a.photos)) a.photos = [];
-  if(typeof a.desc !== 'string') a.desc = '';
-  if(!('cover' in a)) a.cover = null;
-  if(!('ts' in a)) a.ts = Date.now();
-});
-if(!state.chat.length){
-  state.chat = [
-    {role:'ai', text:'Halo. Aku Kancil — pendengar kecil yang tinggal di sudut web ini.', ts:Date.now()},
-    {role:'ai', text:'Kalau kepalamu terlalu penuh, ceritakan saja di sini. Kalau cuma mau tanya-tanya, juga boleh. Mulai dari mana?', ts:Date.now()},
-  ];
-}
-function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){ console.warn('Gagal menyimpan state:', e); } }
-save();
+let state = { nextNo:1, entries:[], albums:[], folders:defaultFolders(), chat:defaultsChat() };
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
 
 const ui = {
   folder:'all', q:'', editingId:null, freshId:null,
@@ -827,137 +849,318 @@ const ui = {
 };
 
 /* ==================================================================
-   PENYIMPANAN FOTO — 3 LAPIS + PEMULIHAN OTOMATIS + DIAGNOS
+   GUDANG AWAN (Supabase) — catatan & foto tersimpan di web
    ================================================================== */
-const Store = { mode:null, ready:null, _db:null };
-const memStore = new Map();
-const LS_PHOTOS = 'tumpuk_ph_';
-const thumbCache = {}, fullCache = {};
-
-function openIDB(){
-  return new Promise((res, rej) => {
-    if(!window.indexedDB) return rej(new Error('IndexedDB tidak tersedia di browser ini'));
-    let rq;
-    try{ rq = window.indexedDB.open('tumpuk_photos_v1', 1); }
-    catch(e){ return rej(e); }
-    rq.onupgradeneeded = () => { try{ rq.result.createObjectStore('photos'); }catch(e){} };
-    rq.onsuccess = () => res(rq.result);
-    rq.onerror   = () => rej(rq.error || new Error('IndexedDB ditolak browser'));
-    rq.onblocked = () => rej(new Error('IndexedDB terblokir oleh tab lain'));
-  });
-}
-async function idbAny(){
-  if(Store._db) return Store._db;
-  try{ Store._db = await openIDB(); return Store._db; }catch(e){ return null; }
-}
-function idbPutOn(db, key, val){
-  return new Promise((res, rej) => {
-    const tx = db.transaction('photos','readwrite');
-    tx.objectStore('photos').put(val, key);
-    tx.oncomplete = res;
-    tx.onerror = () => rej(tx.error || new Error('Gagal menulis ke IndexedDB'));
-  });
-}
-function idbGetOn(db, key){
-  return new Promise((res, rej) => {
-    const rq = db.transaction('photos').objectStore('photos').get(key);
-    rq.onsuccess = () => res(rq.result ?? null);
-    rq.onerror = () => rej(rq.error);
-  });
-}
-function idbDelOn(db, key){
-  return new Promise(res => {
-    const tx = db.transaction('photos','readwrite');
-    tx.objectStore('photos').delete(key);
-    tx.oncomplete = res; tx.onerror = res;
-  });
-}
-function idbKeysOn(db){
-  return new Promise((res, rej) => {
-    const rq = db.transaction('photos').objectStore('photos').getAllKeys();
-    rq.onsuccess = () => res(rq.result || []);
-    rq.onerror = () => rej(rq.error);
-  });
-}
-function lsGet(key){ try{ return localStorage.getItem(LS_PHOTOS + key); }catch(e){ return null; } }
-function lsDel(key){ try{ localStorage.removeItem(LS_PHOTOS + key); }catch(e){} }
+let offlineMode = false;
+let userEmail = '';
+const fotoURL = (id, t) => `${SUPABASE_URL}/storage/v1/object/public/tumpuk/${encodeURIComponent(id)}${t?'_t':''}.jpg`;
 
 function updateStoreStatus(){
   const el = $('#storeStatus'); if(!el) return;
   el.classList.remove('ok','warn');
-  if(Store.mode === 'idb'){ el.textContent = 'penyimpanan foto: aman (IndexedDB)'; el.classList.add('ok'); }
-  else if(Store.mode === 'ls'){ el.textContent = 'penyimpanan foto: cadangan (localStorage) — kapasitas kecil'; el.classList.add('warn'); }
-  else if(Store.mode === 'mem'){ el.textContent = 'penyimpanan foto: SEMENTARA — hilang saat tab ditutup'; el.classList.add('warn'); }
-  else el.textContent = 'memeriksa penyimpanan foto…';
+  if(offlineMode){ el.textContent = 'LURING — perubahan tersimpan lokal dulu'; el.classList.add('warn'); }
+  else if(userEmail){ el.textContent = 'tersambung · ' + userEmail; el.classList.add('ok'); }
+  else el.textContent = 'menyambung…';
 }
-function initStore(){
-  if(Store.ready) return Store.ready;
-  Store.ready = (async () => {
-    try{
-      Store._db = await openIDB();
-      await idbPutOn(Store._db, '__uji', 'ok');
-      const v = await idbGetOn(Store._db, '__uji');
-      await idbDelOn(Store._db, '__uji');
-      if(v === 'ok'){ Store.mode = 'idb'; updateStoreStatus(); return Store.mode; }
-      console.warn('Tumpuk: uji IndexedDB gagal (hasil tidak cocok)');
-    }catch(e){ console.warn('Tumpuk: IndexedDB tidak bisa dipakai →', e); Store._db = null; }
-    try{
-      localStorage.setItem('__uji_tumpuk','1'); localStorage.removeItem('__uji_tumpuk');
-      Store.mode = 'ls'; updateStoreStatus();
-      showToast('Penyimpanan foto utama tidak tersedia — memakai cadangan. Cek tombol "Diagnos penyimpanan" di bawah halaman.');
-      return Store.mode;
-    }catch(e){ console.warn('Tumpuk: localStorage tidak bisa dipakai →', e); }
-    Store.mode = 'mem'; updateStoreStatus();
-    showToast('Browser menolak penyimpanan — foto hanya bertahan selama tab ini terbuka.');
-    return Store.mode;
-  })();
-  return Store.ready;
-}
-async function photoPut(key, val){
-  await Store.ready;
-  if(Store.mode === 'idb') return idbPutOn(Store._db, key, val);
-  if(Store.mode === 'ls'){
-    try{ localStorage.setItem(LS_PHOTOS + key, val); }
-    catch(e){ throw new Error('Penyimpanan browser penuh — hapus beberapa foto lama atau pakai foto lebih kecil.'); }
-    return;
+async function cloud(fn, silent){
+  try{
+    const r = await fn();
+    if(r && r.error){
+      console.error('Gudang:', r.error);
+      if(!silent) showToast('Gagal sinkron: ' + r.error.message);
+      return r;
+    }
+    if(offlineMode){ offlineMode = false; updateStoreStatus(); }
+    return r;
+  }catch(e){
+    console.error('Gudang (jaringan):', e);
+    if(!offlineMode){ offlineMode = true; updateStoreStatus(); }
+    if(!silent) showToast('Gudang tak terjangkau — perubahan disimpan lokal dulu.');
+    return null;
   }
-  memStore.set(key, val);
 }
-async function photoGet(key){
-  await Store.ready;
-  if(Store.mode === 'idb'){
-    try{ const v = await idbGetOn(Store._db, key); if(v) return v; }catch(e){}
-  } else if(Store.mode === 'ls'){
-    const v = lsGet(key); if(v) return v;
+async function cloudLoadAll(){
+  const [fr,en,al,ph,mt] = await Promise.all([
+    sb.from('folders').select('*'),
+    sb.from('entries').select('*'),
+    sb.from('albums').select('*'),
+    sb.from('photos').select('*'),
+    sb.from('meta').select('*'),
+  ]);
+  for(const r of [fr,en,al,ph,mt]) if(r.error) throw r.error;
+
+  state.folders = fr.data.map(f => ({id:f.id, name:f.name, color:f.color, custom:!!f.custom}));
+  state.entries = en.data.map(e => ({
+    id:e.id, no:e.no||0, title:e.title||'', body:e.body||'',
+    mood:e.mood||'tenang', folderId:e.folder_id, ts:Date.parse(e.ts)||Date.now(),
+  })).sort((a,b)=>b.ts-a.ts);
+  const phByAlbum = {};
+  ph.data.forEach(p => {
+    (phByAlbum[p.album_id] = phByAlbum[p.album_id] || []).push({
+      id:p.id, caption:p.caption||'', ts:Date.parse(p.ts)||Date.now(),
+    });
+  });
+  state.albums = al.data.map(a => ({
+    id:a.id, name:a.name, desc:a.descr||'', color:a.color,
+    cover:a.cover||null, ts:Date.parse(a.ts)||Date.now(),
+    photos:phByAlbum[a.id]||[],
+  }));
+  const meta = {};
+  mt.data.forEach(m => meta[m.key] = m.value);
+  state.nextNo = Number(meta.nextNo)
+    || (state.entries.reduce((m,e)=>Math.max(m,e.no),0)+1) || 1;
+  state.chat = (Array.isArray(meta.chat) && meta.chat.length) ? meta.chat : defaultsChat();
+
+  if(!state.folders.length){
+    state.folders = defaultFolders();
+    for(const f of state.folders)
+      cloud(sb.from('folders').upsert({id:f.id, name:f.name, color:f.color, custom:true}), true);
+  }
+  save();
+}
+
+/* ================= GERBANG ================= */
+function setGate(mode, extra){
+  const body = $('#gateBody');
+  $('#gate').hidden = false;
+  document.body.classList.add('locked');
+  if(mode === 'config'){
+    body.innerHTML = `
+      <p class="gate-sub">Web ini belum disambungkan ke gudang awan.</p>
+      <div class="gate-steps">
+        <b>1.</b> Jalankan skrip SQL di <b>SQL Editor</b> Supabase (ada di panduan).<br>
+        <b>2.</b> Buka <b>Settings → API</b>, salin <code>Project URL</code> &amp; <code>anon public key</code>.<br>
+        <b>3.</b> Di index.html, temukan bagian <code>KONFIG</code> paling atas script,
+        tempel dua nilai itu ke <code>SUPABASE_URL</code> dan <code>SUPABASE_ANON_KEY</code>.<br>
+        <b>4.</b> Simpan, push ke GitHub, muat ulang halaman ini.
+      </div>`;
+  } else if(mode === 'loading'){
+    body.innerHTML = `<div class="spin"></div><p class="gate-sub">Menyambung ke gudang…</p>`;
   } else {
-    const v = memStore.get(key); if(v) return v;
+    const up = mode === 'signup';
+    body.innerHTML = `
+      <p class="gate-sub">${up ? 'Buat akun untuk diary-mu — cukup sekali ini.' : 'Meja ini milikmu. Masuk untuk melanjutkan.'}</p>
+      <div class="gate-tabs">
+        <button type="button" id="gTabIn" class="${up?'':'active'}">Masuk</button>
+        <button type="button" id="gTabUp" class="${up?'active':''}">Daftar</button>
+      </div>
+      <input class="gate-field" id="gEmail" type="email" placeholder="email" autocomplete="email">
+      <input class="gate-field" id="gPass" type="password" placeholder="kata sandi (min. 6 huruf)" autocomplete="current-password">
+      <button class="btn btn-primary" id="gGo">${up?'Buat akun':'Masuk'}</button>
+      <p id="gErr"></p>`;
+    $('#gTabIn').onclick = () => setGate('signin');
+    $('#gTabUp').onclick = () => setGate('signup');
+    $('#gGo').onclick = doAuth;
+    $('#gPass').onkeydown = e => { if(e.key === 'Enter') doAuth(); };
+    if(extra) $('#gErr').textContent = extra;
+    setTimeout(() => $('#gEmail').focus(), 60);
   }
-  if(Store.mode !== 'idb'){
-    const db = await idbAny();
-    if(db){ try{ const v = await idbGetOn(db, key); if(v) return v; }catch(e){} }
-  }
-  if(Store.mode !== 'ls'){ const v = lsGet(key); if(v) return v; }
-  if(Store.mode !== 'mem'){ const v = memStore.get(key); if(v) return v; }
-  return null;
 }
-async function photoDel(key){
-  await Store.ready;
-  memStore.delete(key); lsDel(key);
-  const db = await idbAny();
-  if(db){ try{ await idbDelOn(db, key); }catch(e){} }
+async function doAuth(){
+  const email = $('#gEmail').value.trim();
+  const pass  = $('#gPass').value;
+  const isUp  = $('#gTabUp').classList.contains('active');
+  const errEl = $('#gErr');
+  errEl.textContent = '';
+  if(!email || !pass){ errEl.textContent = 'Isi email dan kata sandi dulu ya.'; return; }
+  if(pass.length < 6){ errEl.textContent = 'Kata sandi minimal 6 huruf.'; return; }
+  $('#gGo').disabled = true;
+  try{
+    const r = isUp
+      ? await sb.auth.signUp({email, password: pass})
+      : await sb.auth.signInWithPassword({email, password: pass});
+    if(r.error){
+      errEl.textContent = r.error.message;
+      $('#gGo').disabled = false;
+      return;
+    }
+    if(isUp && !r.data.session){
+      errEl.textContent = 'Akun dibuat! Kalau diminta verifikasi email, cek inbox dulu — atau matikan "Confirm email" di Supabase → Authentication → Providers.';
+      $('#gGo').disabled = false;
+      return;
+    }
+    setGate('loading');
+  }catch(e){
+    errEl.textContent = 'Gagal menyambung: ' + e.message;
+    $('#gGo').disabled = false;
+  }
+}
+function hideGate(){
+  $('#gate').hidden = true;
+  document.body.classList.remove('locked');
 }
 
-/* ---- pemrosesan file foto ----
-   Filosofi: TIDAK ada prafilter yang menolak file.
-   Semua file dicoba dibaca; decoder browser yang memutuskan.
-   HEIC (foto iPhone) dikonversi otomatis jadi JPEG di dalam browser. */
-const readAsDataURL = f => new Promise((res, rej) => {
-  const r = new FileReader();
-  r.onload = () => res(r.result); r.onerror = rej;
-  r.readAsDataURL(f);
-});
+/* ================= DATA LOKAL LAMA (buat migrasi) ================= */
+let legacySnapshot = null;
+function snapshotLegacy(){
+  try{
+    if(localStorage.getItem('tumpuk_migrated')) return;
+    const raw = localStorage.getItem(LS);
+    if(!raw) return;
+    const s = JSON.parse(raw);
+    const hasData = (s.entries && s.entries.length) || (s.albums && s.albums.length);
+    if(!hasData) return;
+    legacySnapshot = s;
+    localStorage.setItem('tumpuk_legacy_backup', raw);
+  }catch(e){}
+}
+function legacyFromBackup(){
+  if(legacySnapshot) return legacySnapshot;
+  try{
+    const raw = localStorage.getItem('tumpuk_legacy_backup');
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+function legacyDB(){
+  return new Promise(res => {
+    if(!window.indexedDB) return res(null);
+    let rq;
+    try{ rq = indexedDB.open('tumpuk_photos_v1', 1); }catch(e){ return res(null); }
+    rq.onupgradeneeded = () => { try{ rq.result.createObjectStore('photos'); }catch(e){} };
+    rq.onsuccess = () => res(rq.result);
+    rq.onerror = () => res(null);
+  });
+}
+async function legacyFiles(){
+  const map = new Map();
+  try{
+    for(let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if(k && k.indexOf('tumpuk_ph_') === 0) map.set(k.slice(10), localStorage.getItem(k));
+    }
+  }catch(e){}
+  const db = await legacyDB();
+  if(db) await new Promise(res => {
+    try{
+      const rq = db.transaction('photos').objectStore('photos').openCursor();
+      rq.onsuccess = e => {
+        const c = e.target.result;
+        if(c){ map.set(String(c.key), c.value); c.continue(); }
+        else res();
+      };
+      rq.onerror = () => res();
+    }catch(e){ res(); }
+  });
+  try{
+    if(navigator.storage && navigator.storage.getDirectory){
+      const root = await navigator.storage.getDirectory();
+      const names = [];
+      for await (const name of (root.keys ? root.keys() : [])) names.push(name);
+      for(const name of names){
+        if(map.has(name)) continue;
+        try{
+          const fh = await root.getFileHandle(name);
+          map.set(name, await fh.getFile());
+        }catch(e){}
+      }
+    }
+  }catch(e){}
+  return map;
+}
+function toBlob(v){
+  if(v instanceof Blob) return v;
+  if(typeof v !== 'string' || v.indexOf('data:') !== 0) return null;
+  const parts = v.split(',');
+  const mime = (parts[0].match(/data:(.*?);/) || [])[1] || 'image/jpeg';
+  const bin = atob(parts[1]);
+  const arr = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type: mime});
+}
+
+/* ================= MIGRASI: angkut data lama ke gudang ================= */
+function maybeOfferMigration(){
+  const snap = legacyFromBackup();
+  const bar = $('#migBar');
+  if(!snap || !bar) return;
+  const nE = (snap.entries||[]).length, nA = (snap.albums||[]).length;
+  const nP = (snap.albums||[]).reduce((s,a)=>s+((a.photos||[]).length),0);
+  if(!nE && !nA) return;
+  $('#migText').innerHTML =
+    `Ada <b>${nE} lembar curhatan</b> &amp; <b>${nP} foto</b> di ${nA} album dari perangkat ini (versi lama).
+     Angkut semuanya ke gudang awan biar ikut tersinkron?`;
+  bar.hidden = false;
+}
+async function migrateLegacy(){
+  const snap = legacyFromBackup();
+  if(!snap){ showToast('Tidak ada data lama yang bisa diangkut.'); return; }
+  $('#btnMigrate').disabled = true;
+  showToast('Mengangkut data lama ke gudang…');
+  try{
+    const idMap = {};
+    const {data: exFolders} = await sb.from('folders').select('id,name');
+    for(const f of (snap.folders||[])){
+      const same = (exFolders||[]).find(x => x.name === f.name);
+      if(same){ idMap[f.id] = same.id; continue; }
+      const r = await cloud(sb.from('folders').upsert({id:f.id, name:f.name, color:f.color, custom:!!f.custom}));
+      if(r && !r.error) idMap[f.id] = f.id;
+    }
+    for(const e of (snap.entries||[])){
+      await cloud(sb.from('entries').upsert({
+        id:e.id, no:e.no||0, title:e.title||'', body:e.body||'',
+        mood:e.mood||'tenang', folder_id:idMap[e.folderId]||null,
+        ts:new Date(e.ts||Date.now()).toISOString(),
+      }), true);
+    }
+    const files = await legacyFiles();
+    let nPhoto = 0, skipPhoto = 0;
+    for(const a of (snap.albums||[])){
+      await cloud(sb.from('albums').upsert({
+        id:a.id, name:a.name, descr:a.desc||'', color:a.color,
+        cover:null, ts:new Date(a.ts||Date.now()).toISOString(),
+      }), true);
+      let coverId = null;
+      for(const p of (a.photos||[])){
+        const blob  = toBlob(files.get(p.id));
+        const blobT = toBlob(files.get(p.id + '_t')) || blob;
+        if(!blob){ skipPhoto++; continue; }
+        const up1 = await cloud(sb.storage.from('tumpuk').upload(p.id + '.jpg', blob,   {contentType: blob.type || 'image/jpeg', upsert: true}), true);
+        const up2 = await cloud(sb.storage.from('tumpuk').upload(p.id + '_t.jpg', blobT, {contentType: (blobT && blobT.type) || 'image/jpeg', upsert: true}), true);
+        if((up1 && up1.error) || (up2 && up2.error)){ skipPhoto++; continue; }
+        await cloud(sb.from('photos').upsert({
+          id:p.id, album_id:a.id, caption:p.caption||'',
+          ts:new Date(p.ts||Date.now()).toISOString(),
+        }), true);
+        if(a.cover === p.id) coverId = p.id;
+        nPhoto++;
+      }
+      if(coverId) await cloud(sb.from('albums').update({cover:coverId}).eq('id', a.id), true);
+    }
+    await cloud(sb.from('meta').upsert({key:'chat', value: snap.chat || defaultsChat()}), true);
+    await cloud(sb.from('meta').upsert({key:'nextNo', value: snap.nextNo || 1}), true);
+
+    localStorage.setItem('tumpuk_migrated', '1');
+    legacySnapshot = null;
+    localStorage.removeItem('tumpuk_legacy_backup');
+    await cloudLoadAll();
+    renderAll(); icons();
+    $('#migBar').hidden = true;
+    showToast(`Berangkat! ${nPhoto} foto + semua catatan kini tersimpan di web.` +
+      (skipPhoto ? ` (${skipPhoto} foto dilewati — berkasnya sudah tidak ada di perangkat ini.)` : ''));
+  }catch(e){
+    console.error(e);
+    showToast('Migrasi gagal: ' + (e.message || e) + ' — coba lagi.');
+  }
+  $('#btnMigrate').disabled = false;
+}
+
+/* ================= PEMROSESAN FOTO ================= */
+function dataUrlToBlob(dataUrl){
+  const parts = dataUrl.split(',');
+  const mime = (parts[0].match(/data:(.*?);/) || [])[1] || 'image/jpeg';
+  const bin = atob(parts[1]);
+  const arr = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], {type: mime});
+}
+function blobToDataURL(blob){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result); r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
 const isHeicFile = f => (f.type && /image\/hei[cf]/i.test(f.type)) || /\.(heic|heif)$/i.test(f.name || '');
-
 let heicLib = null;
 function heicReady(){
   if(window.heic2any) return Promise.resolve(true);
@@ -975,14 +1178,14 @@ function heicReady(){
 }
 async function fileToDataUrl(f){
   if(isHeicFile(f)){
-    showToast('Foto HEIC terdeteksi — mengonversi ke JPEG… (sekali pertama butuh internet)');
+    showToast('Foto HEIC (iPhone) terdeteksi — mengonversi ke JPEG… (pertama kali butuh internet)');
     const ok = await heicReady();
-    if(!ok) throw new Error('konverter HEIC tidak bisa dimuat (butuh koneksi internet). Solusi manual: buka fotonya di Paint → Save as → JPEG.');
+    if(!ok) throw new Error('konverter HEIC tidak bisa dimuat. Alternatif: buka fotonya di Paint → Save as → JPEG.');
     const out = await window.heic2any({ blob: f, toType: 'image/jpeg', quality: .9 });
     const blob = Array.isArray(out) ? out[0] : out;
-    return readAsDataURL(blob);
+    return blobToDataURL(blob);
   }
-  return readAsDataURL(f);
+  return blobToDataURL(f);
 }
 function compress(dataUrl, maxDim, quality){
   return new Promise((res, rej) => {
@@ -1011,64 +1214,68 @@ async function makePhoto(dataUrl){
   try{ thumb = await compress(dataUrl, 640, .72); }catch(e){ thumb = full; }
   return { full, thumb };
 }
-
-async function handleFiles(fileList, albumId){
-    fileList = Array.from(fileList || []);
-  const album = state.albums.find(a => a.id === albumId);
-  if(!album) return;
-  await Store.ready;
-  const files = [...fileList];
+/* ===== UPLOAD ke gudang — anti-race: daftar file difotokopi di baris pertama ===== */
+async function handleFiles(fileList){
+  const files = Array.from(fileList || []);   /* WAJIB baris pertama, sebelum await apa pun */
   if(!files.length){ showToast('Tidak ada file yang terpilih.'); return; }
+  const album = state.albums.find(a => a.id === ui.album);
+  if(!album){ showToast('Buka dulu albumnya, lalu tambahkan foto.'); return; }
+  if(offlineMode){ showToast('Sedang luring — sambungkan internet dulu untuk mengunggah foto.'); return; }
   let ok = 0;
   const gagal = [];
   for(let i = 0; i < files.length; i++){
     const f = files[i];
-    showToast(`Memproses foto… (${i+1}/${files.length})`);
+    showToast(`Mengunggah foto… (${i+1}/${files.length})`);
     try{
-      if(f.size > 30 * 1024 * 1024) throw new Error('ukuran ' + (f.size/1048576).toFixed(1) + ' MB — melebihi batas 30 MB');
+      if(f.size > 30 * 1024 * 1024) throw new Error('ukuran ' + (f.size/1048576).toFixed(1) + ' MB melebihi batas 30 MB');
       const raw = await fileToDataUrl(f);
       const made = await makePhoto(raw);
       const id = uid();
-      await photoPut(id, made.full);
-      await photoPut(id + '_t', made.thumb);
-      fullCache[id] = made.full;
-      thumbCache[id + '_t'] = made.thumb;
+      const up1 = await sb.storage.from('tumpuk').upload(id + '.jpg', dataUrlToBlob(made.full), {contentType:'image/jpeg', upsert:true});
+      if(up1.error) throw up1.error;
+      const up2 = await sb.storage.from('tumpuk').upload(id + '_t.jpg', dataUrlToBlob(made.thumb), {contentType:'image/jpeg', upsert:true});
+      if(up2.error) throw up2.error;
       album.photos.push({id, caption:'', ts:Date.now()});
       if(!album.cover) album.cover = id;
+      await cloud(sb.from('photos').insert({id, album_id:album.id, caption:'', ts:new Date().toISOString()}));
+      await cloud(sb.from('albums').update({cover:album.cover}).eq('id', album.id), true);
       save(); ok++;
-      if(ui.view === 'albums' && ui.album === albumId) renderAlbumPhotos();
+      if(ui.view === 'albums' && ui.album === album.id) renderAlbumPhotos();
     }catch(err){
-      console.error('Tumpuk — file ditolak: "' + (f.name || '(tanpa nama)') + '" | tipe: ' + (f.type || '(kosong)') + ' | ukuran: ' + ((f.size||0)/1024).toFixed(0) + ' KB | alasan:', err);
+      console.error('Tumpuk — upload gagal: "' + (f.name || '(tanpa nama)') + '" | tipe: ' + (f.type || '(kosong)') + ' | alasan:', err);
       gagal.push({file: f, reason: (err && err.message) || 'tidak diketahui'});
     }
   }
   save(); renderAll();
   if(ok === 0 && gagal.length){
-    const g = gagal[0];
-    const f = g.file;
-    const nama = f.name || 'file tanpa nama';
-    const tipe = f.type || 'tipe tidak terbaca';
-    let saran;
-    if(isHeicFile(f))
-      saran = 'Ini format HEIC (iPhone). Konversi otomatis gagal — pastikan internet aktif, atau buka fotonya di Paint lalu Save as JPEG.';
-    else if(!f.type && !/\.[a-z0-9]{2,5}$/i.test(nama))
-      saran = 'File ini tidak punya ekstensi. Tambahkan .jpg di akhir namanya lalu coba lagi.';
-    else
-      saran = 'Chrome bisa menampilkan JPG/PNG/WebP/GIF. Coba buka fotonya di Paint → Save as → JPEG.';
-    showToast(`"${nama}" (${tipe}) ditolak: ${g.reason}. ${saran}`);
+    showToast(`"${gagal[0].file.name || 'file'}" gagal: ${gagal[0].reason}. Detail di Console (F12).`);
   } else {
     const parts = [];
-    if(ok) parts.push(ok + ' foto masuk ke album "' + album.name + '"');
+    if(ok) parts.push(ok + ' foto tersimpan di web — terlihat dari semua perangkatmu');
     if(gagal.length) parts.push(gagal.length + ' gagal — detail di Console (F12)');
     showToast(parts.join(' · '));
   }
 }
 
+/* penanda visual: gambar gagal dimuat → kotaknya jujur */
+document.addEventListener('error', e => {
+  const t = e.target;
+  if(!(t instanceof HTMLImageElement)) return;
+  const box = t.closest('.ph') || t.closest('.album-cover');
+  if(box) box.classList.add('fail');
+}, true);
+document.addEventListener('load', e => {
+  const t = e.target;
+  if(!(t instanceof HTMLImageElement)) return;
+  const box = t.closest('.ph') || t.closest('.album-cover');
+  if(box) box.classList.remove('fail');
+}, true);
+
 /* ================= OVERLAY / TOAST / KONFIRMASI ================= */
 function openOverlay(el){ el.classList.add('open'); document.body.classList.add('locked'); }
 function closeOverlay(el){
   el.classList.remove('open');
-  if(!document.querySelector('.overlay.open') && !$('#lightbox').classList.contains('open'))
+  if(!document.querySelector('.overlay.open') && !$('#lightbox').classList.contains('open') && $('#gate').hidden)
     document.body.classList.remove('locked');
 }
  $$('.overlay').forEach(o => o.addEventListener('click', e => {
@@ -1100,7 +1307,7 @@ function showToast(msg, actLabel, cb){
   else { b.style.display='none'; toastCb = null; }
   $('#toast').classList.add('show');
   clearTimeout(toastT);
-  toastT = setTimeout(() => $('#toast').classList.remove('show'), 6000);
+  toastT = setTimeout(() => $('#toast').classList.remove('show'), 6500);
 }
  $('#toastAct').addEventListener('click', () => {
   $('#toast').classList.remove('show');
@@ -1120,79 +1327,19 @@ function openConfirm(title, msg, cb){
   if(cb) cb();
 });
 
-/* ================= DIAGNOS PENYIMPANAN ================= */
-async function runDiagnostics(){
-  const out = [];
-  const expected = [];
-  state.albums.forEach(a => a.photos.forEach(p => expected.push(p.id)));
-  out.push('Halaman dibuka via : ' + location.protocol + '//' + (location.host || '(file lokal — dobel klik)'));
-  out.push('Mode penyimpanan   : ' + (Store.mode || 'belum siap'));
-  out.push('Metadata album     : ' + expected.length + ' foto tercatat');
-  out.push('');
-  let db = null, idbMsg = '';
-  try{
-    db = await openIDB();
-    await idbPutOn(db, '__diag', 'ok');
-    const v = await idbGetOn(db, '__diag');
-    await idbDelOn(db, '__diag');
-    idbMsg = (v === 'ok') ? 'OK — bisa buka, tulis, dan baca' : 'meragukan — hasil uji tidak cocok';
-  }catch(e){ idbMsg = 'GAGAL — ' + (e && e.name ? e.name + ': ' + e.message : e); }
-  out.push('IndexedDB          : ' + idbMsg);
-  let keys = [];
-  if(db){ try{ keys = await idbKeysOn(db); }catch(e){} }
-  const fullKeys  = keys.filter(k => !String(k).endsWith('_t') && k !== '__uji' && k !== '__diag');
-  const thumbKeys = keys.filter(k => String(k).endsWith('_t'));
-  out.push('Isi IndexedDB      : ' + fullKeys.length + ' foto utuh, ' + thumbKeys.length + ' thumbnail');
-  let lsCount = 0;
-  try{
-    for(let i = 0; i < localStorage.length; i++){
-      const k = localStorage.key(i);
-      if(k && k.indexOf(LS_PHOTOS) === 0) lsCount++;
-    }
-  }catch(e){}
-  out.push('localStorage foto  : ' + lsCount + ' berkas');
-  out.push('');
-  if(expected.length === 0){
-    out.push('Belum ada foto tercatat di album mana pun.');
-  } else {
-    const missing = expected.filter(id => !keys.includes(id) && !lsGet(id) && !memStore.get(id));
-    if(missing.length === 0){
-      out.push('Semua foto tercatat punya berkas gambarnya.');
-      out.push('Kalau tetap tidak tampil: muat ulang halaman (Ctrl+Shift+R).');
-    } else {
-      out.push('PERHATIAN: ' + missing.length + ' foto TERCATAT tapi BERKASNYA TIDAK ADA:');
-      missing.slice(0, 10).forEach(id => out.push('   - ' + id));
-      out.push('Kemungkinan: berkasnya tersimpan di penyimpanan yang kini tidak terbaca browser.');
-      out.push('Solusi cepat: hapus foto bermasalah dari album, lalu unggah ulang.');
-    }
-  }
-  return out.join('\n');
-}
-function openDiag(){
-  openOverlay($('#diagOverlay'));
-  $('#diagOut').textContent = 'Menjalankan pemeriksaan…';
-  runDiagnostics().then(t => { $('#diagOut').textContent = t; }).catch(e => {
-    $('#diagOut').textContent = 'Diagnos gagal dijalankan: ' + e;
-  });
-}
- $('#btnDiag').addEventListener('click', openDiag);
- $('#btnDiagAgain').addEventListener('click', openDiag);
-
 /* ================= HEADER & PINDAH TAMPILAN ================= */
 function renderHeaderForView(){
   const notes = ui.view === 'notes';
   const inAlbum = ui.view === 'albums' && ui.album;
   $$('#viewSwitch button').forEach(b => b.classList.toggle('active', b.dataset.view === ui.view));
-  $('#viewNotes').hidden   = !notes;
-  $('#viewAlbums').hidden  = notes;
-  $('#searchWrap').hidden  = !notes;
-  $('#btnWrite').hidden    = !notes;
-  $('#btnNewAlbum').hidden = !(ui.view === 'albums' && !inAlbum);
-  $('#btnAddPhoto').hidden = !inAlbum;
+  $('#searchWrap').hidden   = !notes;
+  $('#btnWrite').hidden     = !notes;
+  $('#btnNewAlbum').hidden  = !(ui.view === 'albums' && !inAlbum);
+  $('#btnAddPhoto').hidden  = !inAlbum;
   $('#btnEditAlbum').hidden = !inAlbum;
   $('#tagline').textContent = notes
-    ? 'Letakkan isi hatimu di sini — lembar demi lembar, tanpa yang menilai.'
-    : 'Kumpulkan potongan hari yang baik — foto demi foto, lengkap dengan ceritanya.';
+    ? 'Letakkan isi hati di sini — lembar demi lembar, tanpa ada yang menilai.'
+    : 'Kumpulkan potongan hari yang baik — foto demi foto, tersimpan di web ini.';
 }
 function setView(v){
   if(ui.view === v) return;
@@ -1249,8 +1396,11 @@ function renderSpine(){
     e.stopPropagation();
     const f = state.folders.find(x => x.id === del.dataset.del);
     openConfirm(`Hapus jilid "${f.name}"?`, 'Lembar di dalamnya tetap aman — mereka akan kembali tampil di "Semua".', () => {
+      const affected = state.entries.filter(en => en.folderId === f.id);
       state.entries.forEach(en => { if(en.folderId === f.id) en.folderId = null; });
+      affected.forEach(en => cloud(sb.from('entries').update({folder_id:null}).eq('id', en.id), true));
       state.folders = state.folders.filter(x => x.id !== f.id);
+      cloud(sb.from('folders').delete().eq('id', f.id), true);
       if(ui.folder === f.id) ui.folder = 'all';
       save(); renderAll();
       showToast('Jilid dihapus. Lembar-lembarnya tetap tersimpan.');
@@ -1349,6 +1499,14 @@ function updateCount(){
  $('#fBody').addEventListener('input', updateCount);
  $$('.stamp').forEach(s => s.addEventListener('click', () => setMood(s.dataset.mood)));
 
+function pushEntry(e){
+  save();
+  cloud(sb.from('entries').upsert({
+    id:e.id, no:e.no, title:e.title, body:e.body, mood:e.mood,
+    folder_id:e.folderId, ts:new Date(e.ts).toISOString(),
+  }));
+  cloud(sb.from('meta').upsert({key:'nextNo', value:state.nextNo}), true);
+}
 function saveWrite(again){
   const body = $('#fBody').value.trim();
   if(!body){
@@ -1360,16 +1518,17 @@ function saveWrite(again){
   const title = $('#fTitle').value.trim();
   const mood = $('.stamp.active')?.dataset.mood || 'tenang';
   const folderId = $('#fFolder').value || null;
+  let e;
   if(ui.editingId){
-    const e = state.entries.find(x => x.id === ui.editingId);
+    e = state.entries.find(x => x.id === ui.editingId);
     Object.assign(e, {title, body, mood, folderId});
     ui.freshId = null;
   } else {
-    const e = {id:uid(), no:state.nextNo++, title, body, mood, folderId, ts:Date.now()};
+    e = {id:uid(), no:state.nextNo++, title, body, mood, folderId, ts:Date.now()};
     state.entries.push(e);
     ui.freshId = e.id;
   }
-  save(); renderAll();
+  pushEntry(e); renderAll();
   if(again){
     ui.editingId = null;
     $('#fTitle').value = ''; $('#fBody').value = '';
@@ -1379,7 +1538,7 @@ function saveWrite(again){
     showToast('Lembar tersimpan. Lanjutkan, kalau masih ada yang mau keluar.');
   } else {
     closeOverlay($('#writeOverlay'));
-    showToast('Lembar tersimpan di tumpukanmu.');
+    showToast('Lembar tersimpan — ikut tersinkron ke semua perangkatmu.');
   }
 }
  $('#btnSave').addEventListener('click', () => saveWrite(false));
@@ -1413,16 +1572,17 @@ function openRead(id){
  $('#rDel').addEventListener('click', () => askDeleteEntry(readId));
 function askDeleteEntry(id){
   const e = state.entries.find(x => x.id === id); if(!e) return;
-  openConfirm('Hapus lembar ini?', 'Lembar akan dilempar dari tumpukan. Masih sempat menyesal — tombol batal muncul sesaat setelahnya.', () => {
+  openConfirm('Hapus lembar ini?', 'Lembar akan dihapus dari web. Masih sempat menyesal — tombol batal muncul sesaat setelahnya.', () => {
     const i = state.entries.findIndex(x => x.id === id);
     const [rm] = state.entries.splice(i, 1);
     ui.freshId = null;
     save(); renderAll();
+    cloud(sb.from('entries').delete().eq('id', id));
     const ro = $('#readOverlay');
     if(ro.classList.contains('open')) closeOverlay(ro);
     showToast('Lembar dihapus.', 'Batalkan', () => {
       state.entries.splice(Math.min(i, state.entries.length), 0, rm);
-      save(); renderAll();
+      pushEntry(rm); renderAll();
       showToast('Lembar dikembalikan ke tumpukan.');
     });
   });
@@ -1451,7 +1611,9 @@ function openFolderModal(){
   if(!name){ showToast('Beri nama dulu untuk jilidnya.'); $('#folderName').focus(); return; }
   const f = {id:uid(), name, color:ui.color, custom:true};
   state.folders.push(f);
-  save(); renderSpine(); icons();
+  save();
+  cloud(sb.from('folders').upsert({id:f.id, name:f.name, color:f.color, custom:true}));
+  renderSpine(); icons();
   rebuildFolderSelect(f.id);
   closeOverlay($('#folderOverlay'));
   showToast(`Jilid "${name}" siap dipakai.`);
@@ -1463,7 +1625,7 @@ function albumCardHTML(a){
   const rot = ((hash(a.id) % 7) - 3) * 0.35;
   const since = new Date(a.ts).toLocaleDateString('id-ID', {month:'long', year:'numeric'});
   const cover = a.cover
-    ? `<img data-ph="${a.cover}_t" alt="Sampul ${esc(a.name)}">`
+    ? `<img src="${esc(fotoURL(a.cover, true))}" alt="Sampul ${esc(a.name)}">`
     : `<span class="ph-icon"><i data-lucide="images"></i></span>`;
   return `<article class="album-card" data-al="${a.id}" style="--rot:${rot}deg;--c:${a.color}">
     <span class="album-ribbon"></span>
@@ -1483,7 +1645,7 @@ function polaroidHTML(p, idx){
   const rot = ((hash(p.id) % 7) - 3) * 0.5;
   const d = new Date(p.ts).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'});
   return `<figure class="polaroid" data-idx="${idx}" style="--rot:${rot}deg">
-    <div class="ph"><img data-ph="${p.id}_t" alt="Foto kenangan"></div>
+    <div class="ph"><img src="${esc(fotoURL(p.id, true))}" alt="Foto kenangan" loading="lazy"></div>
     <figcaption class="cap">${esc(p.caption) || '&nbsp;'}</figcaption>
     <div class="pdate">${d}</div>
     <div class="p-actions">
@@ -1491,30 +1653,6 @@ function polaroidHTML(p, idx){
       <button data-pact="del" title="Hapus foto"><i data-lucide="trash-2"></i></button>
     </div>
   </figure>`;
-}
-async function hydratePhotos(){
-  const imgs = document.querySelectorAll('#viewAlbums img[data-ph]');
-  await Promise.all([...imgs].map(async el => {
-    const key = el.dataset.ph;
-    const box = el.closest('.ph') || el.closest('.album-cover');
-    if(thumbCache[key]){
-      el.src = thumbCache[key];
-      if(box) box.classList.remove('fail');
-      return;
-    }
-    try{
-      const u = await photoGet(key);
-      if(u){
-        thumbCache[key] = u; el.src = u;
-        if(box) box.classList.remove('fail');
-      } else if(box){
-        box.classList.add('fail');
-      }
-    }catch(e){
-      console.warn('Tumpuk — gagal memuat foto:', key, e);
-      if(box) box.classList.add('fail');
-    }
-  }));
 }
 function renderAlbumsView(){
   const a = ui.album ? state.albums.find(x => x.id === ui.album) : null;
@@ -1537,13 +1675,12 @@ function renderAlbumsView(){
     $('#filterLabel').textContent = a.name;
     renderAlbumPhotos();
   }
-  hydratePhotos();
+  icons();
 }
 function renderAlbumPhotos(){
   const a = state.albums.find(x => x.id === ui.album); if(!a) return;
   $('#emptyAlbumInner').classList.toggle('show', a.photos.length === 0);
   $('#photoGrid').innerHTML = a.photos.map((p,i) => polaroidHTML(p,i)).join('');
-  hydratePhotos();
   icons();
 }
  $('#albumGrid').addEventListener('click', e => {
@@ -1567,6 +1704,7 @@ function renderAlbumPhotos(){
     const p = a.photos[idx];
     if(act.dataset.pact === 'cover'){
       a.cover = p.id; save();
+      cloud(sb.from('albums').update({cover:a.cover}).eq('id', a.id), true);
       renderAlbumPhotos();
       showToast('Sampul album diperbarui.');
     } else askDeletePhoto(idx);
@@ -1581,8 +1719,14 @@ function renderAlbumPhotos(){
  $('#btnAddPhoto').addEventListener('click', () => $('#photoInput').click());
  $('#btnAddPhotoInner').addEventListener('click', () => $('#photoInput').click());
  $('#photoInput').addEventListener('change', e => {
-  if(e.target.files && e.target.files.length && ui.album) handleFiles(e.target.files, ui.album);
+  const picked = e.target.files ? Array.from(e.target.files) : [];  /* salin dulu */
   e.target.value = '';
+  if(picked.length) handleFiles(picked);
+});
+ $('#btnMigrate').addEventListener('click', () => {
+  openConfirm('Angkut data lama ke gudang?',
+    'Semua curhatan & foto dari versi lama di perangkat ini akan diunggah ke gudang awan, lalu tersinkron ke semua perangkatmu.',
+    migrateLegacy);
 });
 
 function renderAlSwatches(){
@@ -1607,6 +1751,13 @@ function openAlbumModal(id){
   ui.alColor = s.dataset.c;
   renderAlSwatches();
 });
+function pushAlbum(a){
+  save();
+  cloud(sb.from('albums').upsert({
+    id:a.id, name:a.name, descr:a.desc||'', color:a.color,
+    cover:a.cover||null, ts:new Date(a.ts||Date.now()).toISOString(),
+  }), true);
+}
  $('#alSave').addEventListener('click', () => {
   const name = $('#alName').value.trim();
   if(!name){ showToast('Beri nama dulu untuk albumnya.'); $('#alName').focus(); return; }
@@ -1614,14 +1765,14 @@ function openAlbumModal(id){
   if(ui.editingAlbum){
     const a = state.albums.find(x => x.id === ui.editingAlbum);
     Object.assign(a, {name, desc, color:ui.alColor});
-    save(); renderAll();
+    pushAlbum(a); renderAll();
     closeOverlay($('#albumOverlay'));
     showToast('Album diperbarui.');
   } else {
     const a = {id:uid(), name, desc, color:ui.alColor, photos:[], cover:null, ts:Date.now()};
     state.albums.push(a);
     ui.album = a.id;
-    save(); renderAll();
+    pushAlbum(a); renderAll();
     closeOverlay($('#albumOverlay'));
     showToast(`Album "${name}" siap — tambahkan foto pertamamu.`);
   }
@@ -1635,9 +1786,11 @@ function openAlbumModal(id){
 function deleteAlbum(id){
   const a = state.albums.find(x => x.id === id); if(!a) return;
   openConfirm(`Hapus album "${a.name}"?`,
-    `Semua ${a.photos.length} foto di dalamnya akan ikut terhapus dari perangkat ini. Tindakan ini tidak bisa dibatalkan.`,
+    `Album dan ${a.photos.length} foto di dalamnya akan dihapus dari web ini. Tindakan ini tidak bisa dibatalkan.`,
     async () => {
-      for(const p of a.photos){ await photoDel(p.id); await photoDel(p.id + '_t'); delete fullCache[p.id]; delete thumbCache[p.id + '_t']; }
+      const paths = a.photos.flatMap(p => [`${p.id}.jpg`, `${p.id}_t.jpg`]);
+      if(paths.length && !offlineMode) cloud(sb.storage.from('tumpuk').remove(paths), true);
+      cloud(sb.from('albums').delete().eq('id', id));
       state.albums = state.albums.filter(x => x.id !== id);
       if(ui.album === id) ui.album = null;
       save(); renderAll();
@@ -1647,11 +1800,14 @@ function deleteAlbum(id){
 function askDeletePhoto(idx){
   const a = state.albums.find(x => x.id === ui.album); if(!a) return;
   const p = a.photos[idx]; if(!p) return;
-  openConfirm('Hapus foto ini?', 'Foto akan dihapus dari album dan perangkat ini.', async () => {
-    await photoDel(p.id); await photoDel(p.id + '_t');
-    delete fullCache[p.id]; delete thumbCache[p.id + '_t'];
+  openConfirm('Hapus foto ini?', 'Foto akan dihapus dari album dan dari web ini.', async () => {
+    if(!offlineMode) cloud(sb.storage.from('tumpuk').remove([`${p.id}.jpg`, `${p.id}_t.jpg`]), true);
+    cloud(sb.from('photos').delete().eq('id', p.id));
     a.photos.splice(idx, 1);
-    if(a.cover === p.id) a.cover = a.photos.length ? a.photos[a.photos.length - 1].id : null;
+    if(a.cover && a.cover === p.id){
+      a.cover = a.photos.length ? a.photos[a.photos.length-1].id : null;
+      cloud(sb.from('albums').update({cover:a.cover}).eq('id', a.id), true);
+    }
     save();
     closeLb();
     renderAll();
@@ -1676,12 +1832,12 @@ document.addEventListener('drop', e => {
   document.body.classList.remove('dragging'); dragDepth = 0;
   if(ui.view === 'albums' && ui.album && e.dataTransfer && e.dataTransfer.files.length){
     e.preventDefault();
-    handleFiles(e.dataTransfer.files, ui.album);
+    handleFiles(Array.from(e.dataTransfer.files));
   }
 });
 document.addEventListener('paste', e => {
   if(ui.view === 'albums' && ui.album && e.clipboardData && e.clipboardData.files.length){
-    handleFiles(e.clipboardData.files, ui.album);
+    handleFiles(Array.from(e.clipboardData.files));
   }
 });
 
@@ -1704,10 +1860,7 @@ function renderLightbox(){
   const img = $('#lbImg');
   img.style.opacity = 0;
   img.onload = () => { img.style.opacity = 1; };
-  if(fullCache[p.id]) img.src = fullCache[p.id];
-  else photoGet(p.id).then(u => {
-    if(u && a.photos[ui.lbIdx] === p){ fullCache[p.id] = u; img.src = u; }
-  });
+  img.src = fotoURL(p.id);
   $('#lbCaption').value = p.caption || '';
   $('#lbCoverBtn').classList.toggle('active', a.cover === p.id);
 }
@@ -1718,7 +1871,7 @@ function lbNav(dir){
 }
 function closeLb(){
   $('#lightbox').classList.remove('open');
-  if(!document.querySelector('.overlay.open')) document.body.classList.remove('locked');
+  if(!document.querySelector('.overlay.open') && $('#gate').hidden) document.body.classList.remove('locked');
   ui.lbIdx = -1;
 }
  $('#lbPrev').addEventListener('click', () => lbNav(-1));
@@ -1730,17 +1883,18 @@ function closeLb(){
   const a = state.albums.find(x => x.id === ui.album);
   const p = a && a.photos[ui.lbIdx]; if(!p) return;
   a.cover = p.id; save();
+  cloud(sb.from('albums').update({cover:a.cover}).eq('id', a.id), true);
   renderAlbumPhotos();
   renderLightbox();
   showToast('Sampul album diperbarui.');
 });
- $('#lbDl').addEventListener('click', async () => {
+ $('#lbDl').addEventListener('click', () => {
   const a = state.albums.find(x => x.id === ui.album);
   const p = a && a.photos[ui.lbIdx]; if(!p) return;
-  const url = fullCache[p.id] || await photoGet(p.id);
-  if(!url) return;
   const el = document.createElement('a');
-  el.href = url; el.download = `tumpuk-${p.id}.jpg`;
+  el.href = fotoURL(p.id);
+  el.download = p.id + '.jpg';
+  el.target = '_blank';
   document.body.appendChild(el); el.click(); el.remove();
 });
  $('#lbCaption').addEventListener('change', () => {
@@ -1748,6 +1902,7 @@ function closeLb(){
   const p = a && a.photos[ui.lbIdx]; if(!p) return;
   p.caption = $('#lbCaption').value.trim().slice(0, 120);
   save();
+  cloud(sb.from('photos').update({caption:p.caption}).eq('id', p.id), true);
   renderAlbumPhotos();
 });
  $('#lbCaption').addEventListener('keydown', e => { if(e.key === 'Enter') e.target.blur(); });
@@ -1805,8 +1960,8 @@ function aiReply(raw){
     return [{text:`Hari ini ${new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}. Mau menandai hari ini dengan satu lembar curhat?`}];
   if(/(kamu siapa|siapa kamu|kamu robot|kamu ai|tentang kamu)/.test(t))
     return [{text:'Aku Kancil — pendengar kecil yang tinggal di sudut web ini. Aku tidak akan menilai, dan ceritamu tidak pernah keluar dari perangkat ini. Aku cuma di sini untuk mendengarkan, menjawab pertanyaan, atau sekadar menemani.'}];
-  if(/(fitur|cara pakai|web ini|situs ini|jilid itu|tumpuk|album|kenangan|foto)/.test(t))
-    return [{text:'Web ini meja pribadimu: di tab "Curhatan" kamu bisa menulis lembar curhat sebanyak apa pun dan menyusunnya ke jilid, sedangkan di tab "Kenangan" kamu bisa bikin album foto — beri nama, tambahkan foto (format apa pun yang bisa dibaca browser, termasuk HEIC dari iPhone yang dikonversi otomatis), tulis keterangan kecil di bawahnya. Semuanya tersimpan otomatis di browser ini.'}];
+  if(/(fitur|cara pakai|web ini|situs ini|jilid itu|tumpuk|album|kenangan|foto|sinkron)/.test(t))
+    return [{text:'Web ini meja pribadimu: di tab "Curhatan" kamu bisa menulis lembar curhat sebanyak apa pun dan menyusunnya ke jilid, di tab "Kenangan" kamu bisa bikin album dan mengunggah foto langsung dari galeri. Semuanya tersimpan di web dan muncul otomatis di semua perangkatmu — HP maupun laptop.'}];
   if(/(capek|lelah|penat|burnout|stres|stress|pegel|remuk|drained)/.test(t))
     return [{text:'Kamu sedang menopang banyak hal sekaligus, ya. Capek itu sah — dan bukan tanda kamu lemah.'},
             {text:'Coba tarik napas sebentar bareng aku. Satu menit saja, janji.', action:true}];
@@ -1840,7 +1995,6 @@ function aiReply(raw){
     return [{text:'Aku tidak mau menjawab asal. Coba jawab tiga hal ini dulu untuk dirimu sendiri: satu — apa yang sebenarnya terjadi, tanpa menambah-nambahi cerita; dua — bagian mana yang benar-benar bisa kamu kendalikan; tiga — langkah terkecil apa yang bisa kamu ambil besok? Kadang jawaban muncul bukan dari nasihat, tapi dari menulis.'}];
   return [{text:pick('fb', FALLBACK(raw))}];
 }
-
 function bubbleHTML(m){
   if(m.role === 'user')
     return `<div class="row me"><div class="bubble">${esc(m.text)}</div></div>`;
@@ -1858,6 +2012,7 @@ function addMsg(m){
   state.chat.push(m);
   if(state.chat.length > 150) state.chat = state.chat.slice(-150);
   save();
+  cloud(sb.from('meta').upsert({key:'chat', value: state.chat}), true);
   const b = $('#chatBody');
   b.insertAdjacentHTML('beforeend', bubbleHTML(m));
   icons();
@@ -1960,13 +2115,52 @@ function finishBreath(){
   addMsg({role:'ai', text:'Tidak apa-apa, kita lewati dulu. Aku tetap di sini kalau nanti butuh.', ts:Date.now()});
 });
 
-/* ================= INIT ================= */
-initStore().then(() => {
-  if(ui.view === 'albums') hydratePhotos();
+/* ================= KELUAR & MUAT ULANG ================= */
+ $('#btnLogout').addEventListener('click', () => {
+  openConfirm('Keluar dari akun?', 'Data tetap aman di gudang — kamu tinggal masuk lagi kapan pun mau.', async () => {
+    await sb.auth.signOut();
+    location.reload();
+  });
 });
-renderAll();
-renderChat();
-icons();
+ $('#btnReload').addEventListener('click', () => location.reload());
+
+/* ================= BOOT ================= */
+(function boot(){
+  if(!CONFIG_OK){ setGate('config'); return; }
+  try{ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+  catch(e){ setGate('config'); return; }
+  snapshotLegacy();
+
+  let appInited = false;
+  async function initApp(){
+    if(appInited) return; appInited = true;
+    setGate('loading');
+    try{
+      const {data: sess} = await sb.auth.getUser();
+      userEmail = sess?.user?.email || '';
+      await cloudLoadAll();
+      offlineMode = false;
+      hideGate();
+      renderAll(); renderChat(); icons(); updateStoreStatus();
+      maybeOfferMigration();
+    }catch(err){
+      console.error('Tumpuk — gagal memuat dari gudang:', err);
+      offlineMode = true;
+      hideGate();
+      renderAll(); renderChat(); icons(); updateStoreStatus();
+      showToast('Gudang tidak bisa dijangkau — memakai salinan lokal. Cek koneksi internetmu.');
+    }
+  }
+
+  sb.auth.onAuthStateChange((event) => {
+    if(event === 'SIGNED_IN') initApp();
+    else if(event === 'SIGNED_OUT'){ appInited = false; setGate('signin'); }
+  });
+  sb.auth.getSession().then(({data}) => {
+    if(data.session) initApp();
+    else setGate('signin');
+  }).catch(() => setGate('signin'));
+})();
 </script>
 </body>
 </html>
