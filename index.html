@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tumpuk. — Letakkan isi hati di sini</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📗</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Lora:ital,wght@0,400..700;1,400..700&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
@@ -521,7 +522,6 @@
           <i data-lucide="search"></i>
           <input type="text" id="searchInput" placeholder="Cari di dalam curhatanmu…">
         </label>
-        <button class="btn btn-ghost" id="btnChat"><i data-lucide="message-circle"></i>Kancil</button>
         <button class="btn btn-primary" id="btnWrite"><i data-lucide="pen-line"></i>Tulis curhat</button>
         <button class="btn btn-primary" id="btnNewAlbum" hidden><i data-lucide="folder-plus"></i>Buat album</button>
         <button class="btn btn-primary" id="btnAddPhoto" hidden><i data-lucide="image-plus"></i>Tambah foto</button>
@@ -540,8 +540,7 @@
       <div class="empty-sheet">
         <i data-lucide="feather"></i>
         <h2>Meja ini masih kosong.</h2>
-        <p>Yang ada cuma meja, kursi, dan waktu yang milikmu sepenuhnya.
-        Mulai dari satu kalimat saja boleh — sisanya biar mengalir.</p>
+        <p>Yang tersisa hanyalah hṛdaya, sunyi, dan waktu yang sepenuhnya milikmu. Tak perlu mencari kata yang sempurna—tuliskan saja apa yang selama ini diam di dalam hati.</p>
         <button class="btn btn-primary" id="btnFirst"><i data-lucide="pen-line"></i>Tulis lembar pertama</button>
       </div>
     </div>
@@ -677,7 +676,7 @@
       <button class="close-x" data-close="folderOverlay" aria-label="Tutup"><i data-lucide="x"></i></button>
     </div>
     <span class="field-label">Namai jilid ini</span>
-    <input class="input-line" id="folderName" placeholder="mis. Kerjaan, Rumah, Diri Sendiri…" maxlength="24">
+    <input class="input-line" id="folderName" placeholder="Kerjaan, keluh kesah, Diri Sendiri…" maxlength="24">
     <span class="field-label" style="margin-top:22px">Pilih warna pita</span>
     <div class="swatches" id="swatches"></div>
     <div class="confirm-row">
@@ -694,9 +693,9 @@
       <button class="close-x" data-close="albumOverlay" aria-label="Tutup"><i data-lucide="x"></i></button>
     </div>
     <span class="field-label">Namai album ini</span>
-    <input class="input-line" id="alName" placeholder="mis. Liburan, Kita, Momen Kecil…" maxlength="28">
+    <input class="input-line" id="alName" placeholder="Liburan, Momen Kecil…" maxlength="28">
     <span class="field-label" style="margin-top:22px">Keterangan kecil — opsional</span>
-    <input class="input-line" id="alDesc" style="font-size:16px" placeholder="Untuk apa album ini?" maxlength="90">
+    <input class="input-line" id="alDesc" style="font-size:16px" placeholder="Tentang Apa Album Ini?" maxlength="90">
     <span class="field-label" style="margin-top:22px">Pilih warna pita</span>
     <div class="swatches" id="alSwatches"></div>
     <div class="confirm-row split">
@@ -752,13 +751,12 @@
   </div>
   <div class="chat-body" id="chatBody"></div>
   <div class="chips" id="chips">
-  <button class="chip" data-say="Aku capek banget hari ini">Aku capek banget</button>
-  <button class="chip" data-breath-chip="1">Latihan napas</button>
-  <button class="chip" data-say="Aku bingung mau nulis apa, bantu aku mulai">Bantu mulai nulis</button>
-  <button class="chip" data-say="Ajak aku ngobrol dong">Ajak aku ngobrol</button>
-  <button class="chip" data-say="Kasih ide judul curhat dong">Ide judul curhat</button>
-  <button class="chip" data-say="Kamu bisa apa aja?">Kamu bisa apa?</button>
-</div>
+    <button class="chip" data-say="Aku capek banget hari ini">Aku capek banget</button>
+    <button class="chip" data-say="Bantu aku tenang sebentar">Bantu aku tenang</button>
+    <button class="chip" data-say="Ajak aku ngobrol dong">Ajak aku ngobrol</button>
+    <button class="chip" data-say="Kasih ide judul curhat dong">Ide judul curhat</button>
+    <button class="chip" data-say="Kamu siapa sebenarnya?">Kamu siapa?</button>
+  </div>
   <form class="chat-input" id="chatForm">
     <input type="text" id="chatInput" placeholder="Tulis apa saja ke Kancil…" autocomplete="off" maxlength="500">
     <button type="submit" class="send-btn" aria-label="Kirim"><i data-lucide="send"></i></button>
@@ -775,7 +773,7 @@
 
 <script>
 /* ================= KONFIG (sudah terisi) ================= */
-const APP_VERSION = 'v3';
+const APP_VERSION = '1.1';
 const SUPABASE_URL = 'https://hepaktfsynslilmooswc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_KaVx4gMZGBDoyK6FGU8fwA_eKVCRQ5q';
 
@@ -878,8 +876,6 @@ async function cloudLoadAll(){
   }));
   const meta = {};
   mt.data.forEach(m => meta[m.key] = m.value);
-  state.nextNo = Number(meta.nextNo)
-    || (state.entries.reduce((m,e)=>Math.max(m,e.no),0)+1) || 1;
   state.chat = (Array.isArray(meta.chat) && meta.chat.length) ? meta.chat : defaultsChat();
 
   if(!state.folders.length){
@@ -1069,7 +1065,6 @@ async function migrateLegacy(){
       if(coverId) await cloud(sb.from('albums').update({cover:coverId}).eq('id', a.id), true);
     }
     await cloud(sb.from('meta').upsert({key:'chat', value: snap.chat || defaultsChat()}), true);
-    await cloud(sb.from('meta').upsert({key:'nextNo', value: snap.nextNo || 1}), true);
 
     localStorage.setItem('tumpuk_migrated', '1');
     localStorage.removeItem('tumpuk_legacy_backup');
@@ -1155,9 +1150,8 @@ async function makePhoto(dataUrl){
   try{ thumb = await compress(dataUrl, 640, .72); }catch(e){ thumb = full; }
   return { full, thumb };
 }
-/* ===== UPLOAD ke gudang — anti-race: daftar file difotokopi di baris pertama ===== */
 async function handleFiles(fileList){
-  const files = Array.from(fileList || []);   /* WAJIB baris pertama, sebelum await apa pun */
+  const files = Array.from(fileList || []);
   if(!files.length){ showToast('Tidak ada file yang terpilih.'); return; }
   const album = state.albums.find(a => a.id === ui.album);
   if(!album){ showToast('Pilih dulu albumnya di baris pil di atas, ya.'); return; }
@@ -1202,14 +1196,14 @@ async function handleFiles(fileList){
 document.addEventListener('error', e => {
   const t = e.target;
   if(!(t instanceof HTMLImageElement)) return;
-  const box = t.closest('.ph') || t.closest('.lb-stage');
+  const box = t.closest('.ph');
   const src = t.getAttribute('src') || '';
   if(!t.dataset.retried && src.indexOf('_t.jpg') !== -1){
     t.dataset.retried = '1';
     t.src = src.replace('_t.jpg', '.jpg');
     return;
   }
-  if(box && box.classList && box.classList.contains('ph')) box.classList.add('fail');
+  if(box) box.classList.add('fail');
 }, true);
 document.addEventListener('load', e => {
   const t = e.target;
@@ -1274,7 +1268,7 @@ function openConfirm(title, msg, cb){
   if(cb) cb();
 });
 
-/* ================= HEADER & PINDAH TAMPILAN ================= */
+/* ================= HEADER & TAMPILAN ================= */
 function renderHeaderForView(){
   const notes = ui.view === 'notes';
   const inAlbum = ui.view === 'albums' && ui.album;
@@ -1303,6 +1297,28 @@ function renderAll(){
   if(ui.view === 'notes') renderBoard();
   else renderAlbumsView();
   icons();
+}
+
+/* ================= NOMOR LEMBAR (dihitung ulang per jilid) ================= */
+function nomorMap(){
+  const map = {};
+  const perJilid = {};
+  [...state.entries].sort((a,b)=>a.ts-b.ts).forEach(e=>{
+    const key = e.folderId || 'tanpa';
+    perJilid[key] = (perJilid[key]||0)+1;
+    map[e.id] = perJilid[key];
+  });
+  return map;
+}
+function updateEyebrow(){
+  const nMap = nomorMap();
+  if(ui.editingId){
+    const e = state.entries.find(x=>x.id===ui.editingId);
+    if(e){ $('#sheetEyebrow').textContent = `Sunting lembar — N° ${String(nMap[e.id]).padStart(2,'0')}`; return; }
+  }
+  const fid = $('#fFolder').value || null;
+  const dalamJilid = state.entries.filter(x => (x.folderId||null) === fid).length;
+  $('#sheetEyebrow').textContent = `Lembar baru — N° ${String(dalamJilid+1).padStart(2,'0')}`;
 }
 
 /* ================= SPINE ================= */
@@ -1369,7 +1385,7 @@ function filtered(){
   }
   return l;
 }
-function cardHTML(e){
+function cardHTML(e, nMap){
   const m = MOODS[e.mood] || MOODS.tenang;
   const f = state.folders.find(x => x.id === e.folderId);
   const rot = ((hash(e.id) % 9) - 4) * 0.22;
@@ -1382,7 +1398,7 @@ function cardHTML(e){
       <button data-act="edit" title="Sunting" aria-label="Sunting"><i data-lucide="pencil"></i></button>
       <button data-act="del" title="Hapus" aria-label="Hapus"><i data-lucide="trash-2"></i></button>
     </div>
-    <div class="card-no">N° ${String(e.no).padStart(2,'0')} · ${dateStr}</div>
+    <div class="card-no">N° ${String(nMap[e.id]).padStart(2,'0')} · ${dateStr}</div>
     <h3 class="card-title">${title}</h3>
     <p class="excerpt">${excerpt}</p>
     <div class="card-foot">
@@ -1393,9 +1409,10 @@ function cardHTML(e){
 }
 function renderBoard(){
   const list = filtered();
+  const nMap = nomorMap();
   $('#emptyAll').classList.toggle('show', state.entries.length === 0);
   $('#emptySearch').classList.toggle('show', state.entries.length > 0 && list.length === 0);
-  $('#board').innerHTML = list.map(cardHTML).join('');
+  $('#board').innerHTML = list.map(e => cardHTML(e, nMap)).join('');
   $('#filterLabel').textContent =
     (ui.folder === 'all' ? 'Semua jilid' : (state.folders.find(f => f.id === ui.folder)?.name || '')) +
     ` · ${list.length} lembar`;
@@ -1428,13 +1445,11 @@ function setMood(m){
 function openWrite(id){
   ui.editingId = id || null;
   const e = id ? state.entries.find(x => x.id === id) : null;
-  $('#sheetEyebrow').textContent = e
-    ? `Sunting lembar — N° ${String(e.no).padStart(2,'0')}`
-    : `Lembar baru — N° ${String(state.nextNo).padStart(2,'0')}`;
   $('#fTitle').value = e ? e.title : '';
   $('#fBody').value  = e ? e.body : '';
   setMood(e ? e.mood : 'tenang');
   rebuildFolderSelect(e ? e.folderId : (ui.folder !== 'all' ? ui.folder : ''));
+  updateEyebrow();
   updateCount();
   openOverlay($('#writeOverlay'));
   setTimeout(() => $('#fTitle').focus(), 120);
@@ -1444,6 +1459,7 @@ function updateCount(){
   $('#fCount').textContent = `${v.length} karakter · ${wc(v)} kata`;
 }
  $('#fBody').addEventListener('input', updateCount);
+ $('#fFolder').addEventListener('change', updateEyebrow);
  $$('.stamp').forEach(s => s.addEventListener('click', () => setMood(s.dataset.mood)));
 
 function pushEntry(e){
@@ -1452,7 +1468,6 @@ function pushEntry(e){
     id:e.id, no:e.no, title:e.title, body:e.body, mood:e.mood,
     folder_id:e.folderId, ts:new Date(e.ts).toISOString(),
   }));
-  cloud(sb.from('meta').upsert({key:'nextNo', value:state.nextNo}), true);
 }
 function saveWrite(again){
   const body = $('#fBody').value.trim();
@@ -1471,7 +1486,7 @@ function saveWrite(again){
     Object.assign(e, {title, body, mood, folderId});
     ui.freshId = null;
   } else {
-    e = {id:uid(), no:state.nextNo++, title, body, mood, folderId, ts:Date.now()};
+    e = {id:uid(), no:0, title, body, mood, folderId, ts:Date.now()};
     state.entries.push(e);
     ui.freshId = e.id;
   }
@@ -1479,7 +1494,7 @@ function saveWrite(again){
   if(again){
     ui.editingId = null;
     $('#fTitle').value = ''; $('#fBody').value = '';
-    $('#sheetEyebrow').textContent = `Lembar baru — N° ${String(state.nextNo).padStart(2,'0')}`;
+    updateEyebrow();
     updateCount();
     $('#fBody').focus();
     showToast('Lembar tersimpan. Lanjutkan, kalau masih ada yang mau keluar.');
@@ -1501,11 +1516,12 @@ let readId = null;
 function openRead(id){
   const e = state.entries.find(x => x.id === id); if(!e) return;
   readId = id;
+  const nMap = nomorMap();
   const m = MOODS[e.mood] || MOODS.tenang;
   const f = state.folders.find(x => x.id === e.folderId);
   const d = new Date(e.ts);
   $('#rNo').textContent =
-    `N° ${String(e.no).padStart(2,'0')} · ${d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · ${d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
+    `N° ${String(nMap[e.id]).padStart(2,'0')} · ${d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})} · ${d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}`;
   $('#rTitle').textContent = e.title || firstLine(e.body);
   $('#rTitle').style.fontStyle = e.title ? 'normal' : 'italic';
   $('#rBody').textContent = e.body;
@@ -1567,7 +1583,7 @@ function openFolderModal(){
 });
  $('#folderName').addEventListener('keydown', e => { if(e.key==='Enter') $('#btnSaveFolder').click(); });
 
-/* ================= KENANGAN: dinding foto ================= */
+/* ================= KENANGAN ================= */
 function currentList(){
   if(ui.album){
     const a = state.albums.find(x => x.id === ui.album);
@@ -1657,7 +1673,7 @@ function renderAlbumsView(){
   $('#photoInput').click();
 });
  $('#photoInput').addEventListener('change', e => {
-  const picked = e.target.files ? Array.from(e.target.files) : [];  /* salin dulu */
+  const picked = e.target.files ? Array.from(e.target.files) : [];
   e.target.value = '';
   if(picked.length) handleFiles(picked);
 });
@@ -1753,7 +1769,7 @@ function askDeletePhotoItem(item){
   });
 }
 
-/* seret & lepas + tempel (Ctrl+V) */
+/* seret & lepas + tempel */
 let dragDepth = 0;
 const dragHasFiles = e => e.dataTransfer && [...(e.dataTransfer.types || [])].indexOf('Files') !== -1;
 document.addEventListener('dragenter', e => {
@@ -1855,7 +1871,7 @@ let touchX = null;
   touchX = null;
 }, {passive:true});
 
-/* ================= KANCIL (AI LOKAL) ================= */
+/* ================= KANCIL — mesin luring ================= */
 const pickPool = {};
 function pick(key, arr){
   const last = pickPool[key];
@@ -1885,7 +1901,7 @@ const FALLBACK = raw => {
 function aiReply(raw){
   const t = raw.toLowerCase();
   if(/(latihan napas|tarik napas|tenangin|breathing|napas)/.test(t))
-    return [{text:'Oke, kita tarik napas bareng. Klik tombolnya dan ikuti lingkaran yang bergerak — aku yang menghitung untukmu.'},
+    return [{text:'Oke, kita tarik napas bareng. Ikuti lingkaran yang bergerak — aku yang menghitung untukmu.'},
             {text:'Empat detik tarik, empat tahan, enam hembus. Empat putaran saja.', action:true}];
   if(/\b(hai|halo|hei|hey|hallo|assalam|selamat pagi|selamat siang|selamat sore|selamat malam)\b/.test(t))
     return [{text:pick('g',[
@@ -1901,7 +1917,7 @@ function aiReply(raw){
   if(/(kamu siapa|siapa kamu|kamu robot|kamu ai|tentang kamu)/.test(t))
     return [{text:'Aku Kancil — pendengar kecil yang tinggal di sudut web ini. Aku tidak akan menilai, dan ceritamu tidak pernah keluar dari perangkat ini. Aku cuma di sini untuk mendengarkan, menjawab pertanyaan, atau sekadar menemani.'}];
   if(/(fitur|cara pakai|web ini|situs ini|jilid itu|tumpuk|album|kenangan|foto|sinkron)/.test(t))
-    return [{text:'Web ini meja pribadimu: tab "Curhatan" isinya catatan tulisanmu yang bisa disusun ke jilid, sedangkan tab "Kenangan" langsung menampilkan dinding fotomu — album-albumnya jadi filter di baris pil di atasnya. Semuanya tersimpan di web dan muncul otomatis di semua perangkatmu.'}];
+    return [{text:'Web ini meja pribadimu: tab "Curhatan" isinya catatan tulisanmu yang bisa disusun ke jilid, tab "Kenangan" langsung menampilkan dinding fotomu dengan album sebagai filter. Semuanya tersimpan di web dan muncul di semua perangkatmu.'}];
   if(/(capek|lelah|penat|burnout|stres|stress|pegel|remuk|drained)/.test(t))
     return [{text:'Kamu sedang menopang banyak hal sekaligus, ya. Capek itu sah — dan bukan tanda kamu lemah.'},
             {text:'Coba tarik napas sebentar bareng aku. Satu menit saja, janji.', action:true}];
@@ -1935,6 +1951,8 @@ function aiReply(raw){
     return [{text:'Aku tidak mau menjawab asal. Coba jawab tiga hal ini dulu untuk dirimu sendiri: satu — apa yang sebenarnya terjadi, tanpa menambah-nambahi cerita; dua — bagian mana yang benar-benar bisa kamu kendalikan; tiga — langkah terkecil apa yang bisa kamu ambil besok? Kadang jawaban muncul bukan dari nasihat, tapi dari menulis.'}];
   return [{text:pick('fb', FALLBACK(raw))}];
 }
+
+/* ================= KANCIL — render & balas (AI + luring) ================= */
 function bubbleHTML(m){
   if(m.role === 'user')
     return `<div class="row me"><div class="bubble">${esc(m.text)}</div></div>`;
@@ -1993,7 +2011,12 @@ function kancilReply(text){
     } catch (err) {
       console.warn("Kancil AI tidak terjangkau → mode luring:", err);
       typing.remove();
-      const msgs = aiReply(text);   /* jawaban luring dari kode lama */
+      const pesan = String(err && err.message || "");
+      if (/high demand|ramai|try again|502/i.test(pesan)) {
+        addMsg({ role: "ai", text: "Aduh, server AI-nya lagi penuh antrean sekarang. Coba kirim ulang dalam semenit, ya — aku tetap di sini. 🐇", ts: Date.now() });
+        return;
+      }
+      const msgs = aiReply(text);
       let acc = 350;
       msgs.forEach((m, i) => {
         if (i > 0) acc += 500 + Math.min(m.text.length * 9, 1200);
@@ -2014,11 +2037,8 @@ function kancilReply(text){
   kancilReply(t);
 });
  $$('#chips .chip').forEach(ch => ch.addEventListener('click', () => {
+  if(ch.dataset.breathChip){ openBreath(); return; }
   addMsg({role:'user', text:ch.dataset.say, ts:Date.now()});
-  $$('#chips .chip').forEach(ch => ch.addEventListener('click', () => {
-  if(ch.dataset.breathChip){ openBreath(); return; }   /* ← tambah baris ini */
-  addMsg({role:'user', text:ch.dataset.say, ts:Date.now()});
-  kancilReply(ch.dataset.say);
   kancilReply(ch.dataset.say);
 }));
 
@@ -2028,7 +2048,6 @@ function setChat(open){
   if(open) setTimeout(() => $('#chatInput').focus(), 350);
 }
  $('#chatFab').addEventListener('click', () => setChat(true));
- $('#btnChat').addEventListener('click', () => setChat(true));
  $('#chatClose').addEventListener('click', () => setChat(false));
 
 /* ================= LATIHAN NAPAS ================= */
