@@ -752,12 +752,13 @@
   </div>
   <div class="chat-body" id="chatBody"></div>
   <div class="chips" id="chips">
-    <button class="chip" data-say="Aku capek banget hari ini">Aku capek banget</button>
-    <button class="chip" data-say="Bantu aku tenang sebentar">Bantu aku tenang</button>
-    <button class="chip" data-say="Ajak aku ngobrol dong">Ajak aku ngobrol</button>
-    <button class="chip" data-say="Kasih ide judul curhat dong">Ide judul curhat</button>
-    <button class="chip" data-say="Kamu siapa sebenarnya?">Kamu siapa?</button>
-  </div>
+  <button class="chip" data-say="Aku capek banget hari ini">Aku capek banget</button>
+  <button class="chip" data-breath-chip="1">Latihan napas</button>
+  <button class="chip" data-say="Aku bingung mau nulis apa, bantu aku mulai">Bantu mulai nulis</button>
+  <button class="chip" data-say="Ajak aku ngobrol dong">Ajak aku ngobrol</button>
+  <button class="chip" data-say="Kasih ide judul curhat dong">Ide judul curhat</button>
+  <button class="chip" data-say="Kamu bisa apa aja?">Kamu bisa apa?</button>
+</div>
   <form class="chat-input" id="chatForm">
     <input type="text" id="chatInput" placeholder="Tulis apa saja ke Kancil…" autocomplete="off" maxlength="500">
     <button type="submit" class="send-btn" aria-label="Kirim"><i data-lucide="send"></i></button>
@@ -774,7 +775,7 @@
 
 <script>
 /* ================= KONFIG (sudah terisi) ================= */
-const APP_VERSION = 'v4';
+const APP_VERSION = 'v3';
 const SUPABASE_URL = 'https://hepaktfsynslilmooswc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_KaVx4gMZGBDoyK6FGU8fwA_eKVCRQ5q';
 
@@ -1278,12 +1279,6 @@ function renderHeaderForView(){
   const notes = ui.view === 'notes';
   const inAlbum = ui.view === 'albums' && ui.album;
   $$('#viewSwitch button').forEach(b => b.classList.toggle('active', b.dataset.view === ui.view));
-  /* PERBAIKAN: panel konten juga harus ikut ditampilkan/disembunyikan
-     mengikuti tab yang aktif — sebelumnya cuma tombol yang di-toggle,
-     jadi panel Kenangan tidak pernah muncul dan panel Curhatan tidak
-     pernah hilang. */
-  $('#viewNotes').hidden = !notes;
-  $('#viewAlbums').hidden = notes;
   $('#searchWrap').hidden   = !notes;
   $('#btnWrite').hidden     = !notes;
   $('#btnNewAlbum').hidden  = notes;
@@ -1976,15 +1971,38 @@ function showTyping(){
 }
 function kancilReply(text){
   const typing = showTyping();
-  const msgs = aiReply(text);
-  let acc = 650 + Math.random() * 600;
-  msgs.forEach((m, i) => {
-    if(i > 0) acc += 500 + Math.min(m.text.length * 9, 1200);
-    setTimeout(() => {
-      if(i === 0) typing.remove();
-      addMsg({role:'ai', text:m.text, action:!!m.action, ts:Date.now()});
-    }, acc);
-  });
+  const history = state.chat.slice(-16).map(m => ({ role: m.role, text: m.text }));
+  (async () => {
+    try {
+      const { data: sess } = await sb.auth.getSession();
+      const token = sess?.session?.access_token;
+      if (!token) throw new Error("belum login");
+      const r = await fetch(`${SUPABASE_URL}/functions/v1/kancil`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "apikey": SUPABASE_ANON_KEY,
+        },
+        body: JSON.stringify({ messages: history }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.reply) throw new Error(j.error || ("HTTP " + r.status));
+      typing.remove();
+      addMsg({ role: "ai", text: j.reply, ts: Date.now() });
+    } catch (err) {
+      console.warn("Kancil AI tidak terjangkau → mode luring:", err);
+      typing.remove();
+      const msgs = aiReply(text);   /* jawaban luring dari kode lama */
+      let acc = 350;
+      msgs.forEach((m, i) => {
+        if (i > 0) acc += 500 + Math.min(m.text.length * 9, 1200);
+        setTimeout(() => {
+          addMsg({ role: "ai", text: m.text, action: !!m.action, ts: Date.now() });
+        }, acc);
+      });
+    }
+  })();
 }
  $('#chatForm').addEventListener('submit', e => {
   e.preventDefault();
@@ -1997,6 +2015,10 @@ function kancilReply(text){
 });
  $$('#chips .chip').forEach(ch => ch.addEventListener('click', () => {
   addMsg({role:'user', text:ch.dataset.say, ts:Date.now()});
+  $$('#chips .chip').forEach(ch => ch.addEventListener('click', () => {
+  if(ch.dataset.breathChip){ openBreath(); return; }   /* ← tambah baris ini */
+  addMsg({role:'user', text:ch.dataset.say, ts:Date.now()});
+  kancilReply(ch.dataset.say);
   kancilReply(ch.dataset.say);
 }));
 
