@@ -1272,6 +1272,8 @@ function openConfirm(title, msg, cb){
 function renderHeaderForView(){
   const notes = ui.view === 'notes';
   const inAlbum = ui.view === 'albums' && ui.album;
+  $('#viewNotes').hidden = !notes;
+  $('#viewAlbums').hidden = notes;
   $$('#viewSwitch button').forEach(b => b.classList.toggle('active', b.dataset.view === ui.view));
   $('#searchWrap').hidden   = !notes;
   $('#btnWrite').hidden     = !notes;
