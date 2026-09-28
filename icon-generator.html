@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Pembuat Ikon — Tumpuk.</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@900&display=swap" rel="stylesheet">
+<style>
+  body{font-family:Arial,sans-serif;background:#F2EBDB;color:#292319;text-align:center;padding:30px}
+  canvas{border-radius:24px;box-shadow:0 10px 30px rgba(0,0,0,.25);margin:16px 0}
+  label{margin:0 12px;cursor:pointer}
+  button{padding:10px 16px;margin:6px;border:0;border-radius:8px;background:#33493B;color:#F3EBDC;cursor:pointer;font-weight:bold}
+  button:hover{opacity:.9}
+</style>
+</head>
+<body>
+  <h1>Pembuat Ikon — Tumpuk.</h1>
+  <div>
+    <label><input type="radio" name="d" value="A" checked> A — Monogram "T." (rekomendasi)</label>
+    <label><input type="radio" name="d" value="B"> B — Tumpukan kertas</label>
+  </div>
+  <canvas id="cv" width="512" height="512"></canvas>
+  <div>
+    <button data-s="512" data-m="0">Unduh icon-512.png</button>
+    <button data-s="192" data-m="0">Unduh icon-192.png</button>
+    <button data-s="512" data-m="1">Unduh icon-512-maskable.png</button>
+    <button data-s="180" data-m="0">Unduh apple-touch-icon.png</button>
+  </div>
+  <p>Unduh ke-empatnya, taruh di folder repo yang sama dengan index.html, lalu push.</p>
+
+<script>
+const GREEN='#33493B', CREAM='#F3EBDC', GOLD='#C9A96A';
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+
+function rrect(c,x,y,w,h,r){
+  c.beginPath();
+  c.moveTo(x+r,y);
+  c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r);
+  c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r);
+  c.closePath();
+}
+function draw(c, size, design, maskable){
+  c.clearRect(0,0,size,size);
+  c.fillStyle = GREEN; c.fillRect(0,0,size,size);
+  c.save();
+  if(maskable){ c.translate(size/2,size/2); c.scale(.78,.78); c.translate(-size/2,-size/2); }
+  if(design === 'A'){
+    c.font = `900 ${size*0.62}px Fraunces, Georgia, serif`;
+    c.textAlign='left'; c.textBaseline='alphabetic';
+    const tw = c.measureText('T').width;
+    const dotR = size*0.075, gap = size*0.04;
+    const totalW = tw + gap + dotR*2;
+    const x0 = size/2 - totalW/2;
+    const base = size/2 + size*0.22;
+    c.fillStyle = CREAM;
+    c.fillText('T', x0, base);
+    c.fillStyle = GOLD;
+    c.beginPath();
+    c.arc(x0 + tw + gap + dotR, base - dotR*1.1, dotR, 0, 7);
+    c.fill();
+  } else {
+    const cards = [
+      {r:-6, y:size*0.30, w:size*0.52, h:size*0.44, f:'#EFE6D2'},
+      {r: 4, y:size*0.26, w:size*0.52, h:size*0.44, f:'#FFFDF6'},
+      {r:-2, y:size*0.20, w:size*0.52, h:size*0.44, f:'#FBF7EC'},
+    ];
+    cards.forEach((k,i) => {
+      c.save();
+      c.translate(size/2, k.y + k.h/2);
+      c.rotate(k.r * Math.PI/180);
+      c.shadowColor = 'rgba(0,0,0,.28)';
+      c.shadowBlur = size*0.04; c.shadowOffsetY = size*0.02;
+      c.fillStyle = k.f;
+      rrect(c, -k.w/2, -k.h/2, k.w, k.h, size*0.035);
+      c.fill();
+      c.shadowColor = 'transparent';
+      if(i === 2){ /* kartu paling atas: kotak "foto" kecil ala polaroid */
+        c.fillStyle = '#E7DECA';
+        rrect(c, -k.w/2+size*0.03, -k.h/2+size*0.03, k.w-size*0.06, k.h*0.62, size*0.02);
+        c.fill();
+        c.fillStyle = GREEN;
+        c.beginPath();
+        c.arc(0, k.h/2 - size*0.055, size*0.02, 0, 7);
+        c.fill();
+      }
+      c.restore();
+    });
+  }
+  c.restore();
+}
+function render(){
+  const d = document.querySelector('input[name=d]:checked').value;
+  draw(ctx, 512, d, false);
+}
+document.querySelectorAll('input[name=d]').forEach(r => r.addEventListener('change', render));
+document.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  const d = document.querySelector('input[name=d]:checked').value;
+  const s = Number(b.dataset.s), m = Number(b.dataset.m);
+  const off = document.createElement('canvas');
+  off.width = s; off.height = s;
+  draw(off.getContext('2d'), s, d, m);
+  off.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = b.textContent.replace('Unduh ','');
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+}));
+/* tunggu font Fraunces ke-load biar hurufnya pas */
+document.fonts.ready.then(render);
+render();
+</script>
+</body>
+</html>
